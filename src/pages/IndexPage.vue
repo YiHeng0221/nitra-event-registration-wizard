@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import WizardShell from 'src/components/WizardShell/WizardShell.vue'
 import Step1Attendee from 'src/components/steps/Step1Attendee/Step1Attendee.vue'
+import Step2Sessions from 'src/components/steps/Step2Sessions/Step2Sessions.vue'
 </script>
 
 <template>
@@ -13,6 +14,9 @@ import Step1Attendee from 'src/components/steps/Step1Attendee/Step1Attendee.vue'
         <WizardShell>
           <template #step-attendee>
             <Step1Attendee />
+          </template>
+          <template #step-sessions>
+            <Step2Sessions />
           </template>
         </WizardShell>
       </q-page>
