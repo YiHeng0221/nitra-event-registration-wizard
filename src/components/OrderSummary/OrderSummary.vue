@@ -6,6 +6,14 @@ import { loadTicketTypes } from 'src/data/tickets'
 import { loadAddons } from 'src/data/addons'
 import Paper from 'src/components/Paper/Paper.vue'
 
+withDefaults(
+  defineProps<{
+    title?: string
+    totalLabel?: string
+  }>(),
+  { title: 'Order Summary', totalLabel: 'Total' },
+)
+
 const { state } = useRegistration()
 const { discount, total, formatCurrency } = usePricing()
 const tickets = loadTicketTypes()
@@ -41,7 +49,7 @@ const lines = computed<SummaryLine[]>(() => {
     padding="md"
   >
     <h3 class="text-subtitle1 text-neutral mb-3 font-semibold">
-      Order Summary
+      {{ title }}
     </h3>
 
     <div class="flex flex-col gap-2">
@@ -64,7 +72,7 @@ const lines = computed<SummaryLine[]>(() => {
     </div>
 
     <div class="border-neutral-muted mt-3 flex items-center justify-between border-t pt-3">
-      <span class="text-subtitle2 text-neutral font-semibold">Total</span>
+      <span class="text-subtitle2 text-neutral font-semibold">{{ totalLabel }}</span>
       <span class="text-subtitle1 text-neutral font-bold">{{ formatCurrency(total) }}</span>
     </div>
   </Paper>
