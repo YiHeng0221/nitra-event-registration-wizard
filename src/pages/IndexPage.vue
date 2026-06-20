@@ -1,13 +1,19 @@
 <script setup lang="ts">
-// Your implementation starts here
+// Single mount point for the registration wizard.
+// The wizard shell (QStepper + steps + live summary) is implemented in #23;
+// this page only establishes the route and placeholder while the structure lands.
 </script>
 
 <template>
-  <q-layout>
+  <q-layout view="lHh Lpr lFf">
     <q-page-container>
-      <q-page padding>
-        <h1 class="text-h3 text-neutral q-mb-md">Event Registration Wizard</h1>
-        <p class="text-neutral-muted">Start building your registration wizard here.</p>
+      <q-page class="flex flex-center bg-surface-l1">
+        <div
+          class="text-neutral-muted text-subtitle1"
+          data-testid="wizard-placeholder"
+        >
+          Registration wizard mounts here
+        </div>
       </q-page>
     </q-page-container>
   </q-layout>
