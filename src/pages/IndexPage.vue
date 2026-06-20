@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import WizardShell from 'src/components/WizardShell/WizardShell.vue'
+import Step1Attendee from 'src/components/steps/Step1Attendee/Step1Attendee.vue'
 </script>
 
 <template>
@@ -9,7 +10,11 @@ import WizardShell from 'src/components/WizardShell/WizardShell.vue'
         <h1 class="text-h4 text-neutral mb-4">
           WebDev Summit 2028 — Registration
         </h1>
-        <WizardShell />
+        <WizardShell>
+          <template #step-attendee>
+            <Step1Attendee />
+          </template>
+        </WizardShell>
       </q-page>
     </q-page-container>
   </q-layout>
