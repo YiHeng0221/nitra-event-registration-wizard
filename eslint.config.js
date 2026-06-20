@@ -45,6 +45,7 @@ export default tseslint.config(
       // Project conventions (see CLAUDE.md).
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'vue/multi-word-component-names': 'off', // step pages like Review.vue are fine
+      'vue/require-default-prop': 'off', // optional props are typed optional in TS, no runtime default needed
       'vue/component-api-style': ['error', ['script-setup']], // enforce <script setup>
       'vue/define-macros-order': ['error', {
         order: ['defineProps', 'defineEmits', 'defineModel'],
