@@ -2,6 +2,7 @@
 import WizardShell from 'src/components/WizardShell/WizardShell.vue'
 import Step1Attendee from 'src/components/steps/Step1Attendee/Step1Attendee.vue'
 import Step2Sessions from 'src/components/steps/Step2Sessions/Step2Sessions.vue'
+import Step3Addons from 'src/components/steps/Step3Addons/Step3Addons.vue'
 </script>
 
 <template>
@@ -17,6 +18,9 @@ import Step2Sessions from 'src/components/steps/Step2Sessions/Step2Sessions.vue'
           </template>
           <template #step-sessions>
             <Step2Sessions />
+          </template>
+          <template #step-addons>
+            <Step3Addons />
           </template>
         </WizardShell>
       </q-page>
