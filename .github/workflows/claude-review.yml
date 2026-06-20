@@ -33,6 +33,8 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Use the workflow's built-in token so the Claude GitHub App is not required.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           # Load the project's skill so review follows our three-lens rubric.
           claude_args: "--model sonnet --setting-sources project"
           prompt: |
