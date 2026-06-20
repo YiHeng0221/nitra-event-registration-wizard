@@ -4,7 +4,12 @@
   "type": "module",
   "scripts": {
     "dev": "quasar dev",
-    "build": "quasar build"
+    "build": "quasar build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "vue-tsc --noEmit",
+    "postinstall": "quasar prepare",
+    "prepare": "husky"
   },
   "dependencies": {
     "@quasar/extras": "1.17.0",
@@ -13,10 +18,19 @@
     "vue-router": "4.5.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@quasar/app-vite": "2.2.1",
     "@quasar/cli": "2.4.0",
+    "eslint": "^10.5.0",
+    "eslint-plugin-vue": "^10.9.2",
+    "globals": "^17.6.0",
+    "husky": "^9.1.7",
     "sass-embedded": "1.92.0",
-    "unocss": "66.3.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1",
+    "unocss": "66.3.3",
+    "vue-eslint-parser": "^10.4.1",
+    "vue-tsc": "^3.3.5"
   },
   "engines": {
     "node": "22.17.0",
