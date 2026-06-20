@@ -1,0 +1,53 @@
+name: claude-review
+
+# Auto-review every pull request with Claude Code, using the project's
+# code-review skill (.claude/skills/code-review/SKILL.md) as the rubric.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  # One review per PR branch; a new push cancels an in-flight review.
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: Claude code review
+    # Skip drafts — review only when the PR is ready.
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Claude review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Load the project's skill so review follows our three-lens rubric.
+          claude_args: "--model sonnet --setting-sources project"
+          prompt: |
+            Review this pull request using the project's code-review skill at
+            .claude/skills/code-review/SKILL.md.
+
+            Apply the three lenses in order — (1) correctness & business logic,
+            (2) Vue patterns & design fidelity, (3) architecture & quality —
+            and honour this repo's rules in CLAUDE.md and the ADRs in doc/.
+
+            Pay special attention to the graded business rules: prices read from
+            src/mocks/event.js, VIP 10% discount on workshops only, conditional
+            shipping-address-required-when-merch, capacity/overlap availability,
+            and deferred submit-time validation (never gate navigation).
+
+            Post findings as inline PR review comments, each tagged 🔴 / 🟡 / 🟣
+            with file:line and a one-line reason. Cap nits at 5. End with the
+            review-summary table and a `VERDICT: pass | changes-requested` line.
+            Do not modify code — review only.
