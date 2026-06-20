@@ -10,6 +10,7 @@ permissions:
   contents: read
   pull-requests: write
   issues: write
+  id-token: write # required by claude-code-action for OIDC token exchange
 
 concurrency:
   # One review per PR branch; a new push cancels an in-flight review.
