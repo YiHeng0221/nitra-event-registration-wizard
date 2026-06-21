@@ -54,7 +54,7 @@ jobs:
           claude_args: >-
             --model sonnet
             --setting-sources project
-            --allowedTools "Read,Grep,Glob,Write(review-output.md)"
+            --allowedTools "Read,Grep,Glob,Write"
           prompt: |
             Review this pull request and WRITE your review to the file
             `review-output.md` in the repo root using the Write tool. Do NOT
