@@ -32,8 +32,8 @@ const model = defineModel<string>({ default: '' })
         :disabled="disabled"
         :aria-describedby="describedBy"
         :aria-invalid="invalid"
-        class="bg-surface-l0 text-neutral placeholder:text-neutral-quiet w-full appearance-none rounded-md border px-3 py-2.5 text-[16px] outline-none transition-colors focus:border-[var(--bg-brand-emphasis-rest)] disabled:opacity-60"
-        :class="invalid ? 'border-danger-emphasis' : 'border-neutral-muted'"
+        class="bg-surface-l0 text-neutral placeholder:text-neutral-quiet w-full appearance-none rounded-md border border-solid px-3 py-2.5 text-[16px] outline-none transition-colors focus:border-[color:var(--bg-brand-emphasis-rest)] disabled:opacity-60"
+        :class="invalid ? 'border-[color:var(--border-danger-emphasis)]' : 'border-[color:var(--border-neutral-muted)]'"
         @blur="emit('blur')"
         @focus="emit('focus')"
       >
