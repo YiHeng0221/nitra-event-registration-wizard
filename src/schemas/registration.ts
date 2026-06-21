@@ -13,17 +13,18 @@ import {
  */
 export const registrationSchema = z
   .object({
-    ...contactStepSchema.shape,
+    // Contact fields are nested under `attendee` to match RegistrationState.
+    attendee: contactStepSchema,
     ...ticketStepSchema.shape,
     ...sessionsStepSchema.shape,
     ...addonsStepSchema.shape,
   })
   .superRefine((data, ctx) => {
     const hasMerchandise = Object.keys(data.merchandise).length > 0
-    if (hasMerchandise && data.shippingAddress.trim() === '') {
+    if (hasMerchandise && data.attendee.shippingAddress.trim() === '') {
       ctx.addIssue({
         code: 'custom',
-        path: ['shippingAddress'],
+        path: ['attendee', 'shippingAddress'],
         message: 'Shipping address is required when merchandise is selected',
       })
     }

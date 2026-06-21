@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { useRegistration } from 'src/composables/useRegistration'
+import { useValidation } from 'src/composables/useValidation'
 import { loadTicketTypes } from 'src/data/tickets'
 import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
 import AppInput from 'src/components/AppInput/AppInput.vue'
 
 const { state } = useRegistration()
+const { errorFor } = useValidation()
 const tickets = loadTicketTypes()
 </script>
 
@@ -14,6 +16,12 @@ const tickets = loadTicketTypes()
       <h2 class="text-subtitle1 text-neutral mb-3">
         Select Ticket Type
       </h2>
+      <p
+        v-if="errorFor('ticketId')"
+        class="text-danger mb-2 text-sm"
+      >
+        {{ errorFor('ticketId') }}
+      </p>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         <SelectableCard
           v-for="ticket in tickets"
@@ -65,23 +73,27 @@ const tickets = loadTicketTypes()
           v-model="state.attendee.fullName"
           label="Full Name"
           placeholder="Enter your full name"
+          :error="errorFor('fullName')"
         />
         <AppInput
           v-model="state.attendee.email"
           type="email"
           label="Email"
           placeholder="Enter your email address"
+          :error="errorFor('email')"
         />
         <AppInput
           v-model="state.attendee.phone"
           type="tel"
           label="Phone"
           placeholder="Enter your phone number"
+          :error="errorFor('phone')"
         />
         <AppInput
           v-model="state.attendee.company"
           label="Company"
           placeholder="Enter your company name"
+          :error="errorFor('company')"
         />
       </div>
       <div class="mt-4 flex flex-col gap-4">
@@ -89,11 +101,13 @@ const tickets = loadTicketTypes()
           v-model="state.attendee.jobTitle"
           label="Job Title"
           placeholder="Enter your job title"
+          :error="errorFor('jobTitle')"
         />
         <AppInput
           v-model="state.attendee.shippingAddress"
           label="Shipping Address (Optional)"
           placeholder="Enter your shipping address"
+          :error="errorFor('shippingAddress')"
         />
       </div>
     </section>

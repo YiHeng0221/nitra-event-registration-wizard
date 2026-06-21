@@ -1,6 +1,10 @@
+import { computed, ref, type ComputedRef } from 'vue'
 import { registrationSchema } from 'src/schemas/registration'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useConflicts } from 'src/composables/useConflicts'
+
+// Shared across the app so step components can show field-level hints after submit.
+const lastResult = ref<ValidationResult | null>(null)
 
 /** Which wizard step each top-level field belongs to (for error navigation). */
 const FIELD_STEP: Record<string, number> = {
@@ -27,8 +31,16 @@ export interface ValidationResult {
   jumpTo: number | null
 }
 
+export interface UseValidation {
+  validateAll: () => ValidationResult
+  /** Field name → error messages from the last submit (reactive). */
+  fieldErrors: ComputedRef<Record<string, string[]>>
+  /** First error message for a field, or undefined. */
+  errorFor: (field: string) => string | undefined
+}
+
 /** Unified, submit-time validation aggregating zod and time conflicts. */
-export function useValidation(): { validateAll: () => ValidationResult } {
+export function useValidation(): UseValidation {
   const { state } = useRegistration()
   const { sessionConflicts } = useConflicts()
 
@@ -45,7 +57,9 @@ export function useValidation(): { validateAll: () => ValidationResult } {
     const result = registrationSchema.safeParse(state)
     if (!result.success) {
       for (const issue of result.error.issues) {
-        addError(String(issue.path[0] ?? 'form'), issue.message)
+        // Use the leaf path segment as the field key (e.g. attendee.fullName -> fullName).
+        const field = issue.path[issue.path.length - 1]
+        addError(String(field ?? 'form'), issue.message)
       }
     }
 
@@ -64,13 +78,20 @@ export function useValidation(): { validateAll: () => ValidationResult } {
     }
 
     const erroredSteps = Object.keys(stepHasError).map(Number)
-    return {
+    const result2: ValidationResult = {
       valid: Object.keys(errors).length === 0,
       errors,
       stepHasError,
       jumpTo: erroredSteps.length > 0 ? Math.min(...erroredSteps) : null,
     }
+    lastResult.value = result2
+    return result2
   }
 
-  return { validateAll }
+  const fieldErrors = computed(() => lastResult.value?.errors ?? {})
+  function errorFor(field: string): string | undefined {
+    return fieldErrors.value[field]?.[0]
+  }
+
+  return { validateAll, fieldErrors, errorFor }
 }
