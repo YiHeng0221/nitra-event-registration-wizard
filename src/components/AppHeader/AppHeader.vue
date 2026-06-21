@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <header class="flex items-center justify-center px-12 py-4 md:justify-start">
+  <header class="flex h-[72px] items-center justify-center px-12 md:justify-start">
     <div class="flex items-center gap-3">
       <span class="bg-neutral-emphasis-rest flex h-9 w-9 items-center justify-center rounded-lg">
         <q-icon

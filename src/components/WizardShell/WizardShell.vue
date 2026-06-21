@@ -54,24 +54,25 @@ function submit(): void {
 </script>
 
 <template>
-  <div class="bg-surface-l0 min-h-screen">
-    <!-- Header -->
-    <AppHeader />
-    <div class="border-neutral-muted border-t" />
+  <div class="bg-surface-l0 flex h-screen flex-col">
+    <!-- Header — 72px -->
+    <AppHeader class="shrink-0" />
+    <div class="bg-[var(--border-neutral-muted)] h-px shrink-0" />
 
-    <!-- Stepper -->
-    <div class="px-6 py-6 lg:px-30">
+    <!-- Stepper — 80px -->
+    <div class="flex h-[80px] shrink-0 items-center px-6 lg:px-30">
       <Stepper
+        class="w-full"
         :steps="STEPS"
         :current="state.currentStep"
         :error-steps="errorSteps"
         @navigate="goTo"
       />
     </div>
-    <div class="border-neutral-muted border-t" />
+    <div class="bg-[var(--border-neutral-muted)] h-px shrink-0" />
 
-    <!-- Form -->
-    <div class="px-6 py-10 lg:px-30">
+    <!-- Form — fills the remaining viewport, scrolls -->
+    <div class="flex-1 overflow-y-auto px-6 py-10 lg:px-30">
       <Transition
         name="fade"
         mode="out-in"
@@ -94,10 +95,10 @@ function submit(): void {
         />
       </Transition>
     </div>
-    <div class="border-neutral-muted border-t" />
+    <div class="bg-[var(--border-neutral-muted)] h-px shrink-0" />
 
-    <!-- Actions -->
-    <div class="flex items-center justify-between px-6 py-6 lg:px-30">
+    <!-- Actions — 72px -->
+    <div class="flex h-[72px] shrink-0 items-center justify-between px-6 lg:px-30">
       <button
         v-if="state.currentStep > 1"
         type="button"
@@ -110,7 +111,7 @@ function submit(): void {
 
       <button
         type="button"
-        class="bg-accent-emphasis-rest hover:bg-accent-emphasis-hover text-inverse text-subtitle2 cursor-pointer rounded-md border-0 px-5 py-2 font-medium"
+        class="bg-accent-emphasis-rest hover:bg-accent-emphasis-hover text-inverse cursor-pointer rounded-[10px] border-0 px-5 py-2 text-[14px] font-semibold leading-5"
         @click="isLastStep ? submit() : goNext()"
       >
         {{ isLastStep ? 'Submit Registration' : NEXT_LABEL[state.currentStep] }}

@@ -15,34 +15,30 @@ function onSubmit(): void {
 </script>
 
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-page-container>
-      <q-page class="bg-surface-l0">
-        <div
-          v-if="submitted"
-          class="mx-auto max-w-[640px] p-6 lg:p-12"
-        >
-          <SuccessScreen />
-        </div>
+  <div
+    v-if="submitted"
+    class="bg-surface-l1 flex min-h-screen items-center justify-center p-6"
+  >
+    <div class="w-full max-w-[640px]">
+      <SuccessScreen />
+    </div>
+  </div>
 
-        <WizardShell
-          v-else
-          @submit="onSubmit"
-        >
-          <template #step-attendee>
-            <Step1Attendee />
-          </template>
-          <template #step-sessions>
-            <Step2Sessions />
-          </template>
-          <template #step-addons>
-            <Step3Addons />
-          </template>
-          <template #step-review>
-            <Step4Review />
-          </template>
-        </WizardShell>
-      </q-page>
-    </q-page-container>
-  </q-layout>
+  <WizardShell
+    v-else
+    @submit="onSubmit"
+  >
+    <template #step-attendee>
+      <Step1Attendee />
+    </template>
+    <template #step-sessions>
+      <Step2Sessions />
+    </template>
+    <template #step-addons>
+      <Step3Addons />
+    </template>
+    <template #step-review>
+      <Step4Review />
+    </template>
+  </WizardShell>
 </template>
