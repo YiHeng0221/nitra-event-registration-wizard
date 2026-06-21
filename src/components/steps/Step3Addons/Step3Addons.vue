@@ -96,7 +96,7 @@ function sizeOptions(item: MerchandiseAddon): Array<{ label: string; value: stri
           type="button"
           role="tab"
           :aria-selected="category === entry.key"
-          class="rounded-md px-3 py-1 text-subtitle2 transition-colors"
+          class="cursor-pointer rounded-md border-0 bg-transparent px-3 py-1 text-subtitle2 transition-colors"
           :class="
             category === entry.key
               ? 'bg-brand-emphasis-rest text-inverse'
