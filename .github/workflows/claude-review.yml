@@ -2,6 +2,11 @@ name: claude-review
 
 # Auto-review every pull request with Claude Code, using the project's
 # code-review skill (.claude/skills/code-review/SKILL.md) as the rubric.
+#
+# The review is posted as a real PR review with line-by-line inline comments
+# via the GitHub reviews API (gh) — not the action's inline-comment buffer,
+# which previously passed the check while leaving nothing visible. Claude is
+# told it MUST post exactly one review every run (even a clean pass).
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -31,26 +36,65 @@ jobs:
 
       - name: Claude review
         uses: anthropics/claude-code-action@v1
+        env:
+          # Explicit auth for the gh CLI calls Claude makes to post the review.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          # Use the workflow's built-in token so the Claude GitHub App is not required.
+          # Built-in token so gh is authed in the action environment.
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Load the project's skill so review follows our three-lens rubric.
-          claude_args: "--model sonnet --setting-sources project"
+          # Allow shell so Claude posts the review itself via the gh CLI; keep
+          # the tool surface tight (read + gh/git only — never edits code).
+          claude_args: >-
+            --model sonnet
+            --setting-sources project
+            --allowedTools "Bash(gh:*),Bash(git:*),Bash(jq:*),Bash(cat:*),Bash(mktemp:*),Read,Grep,Glob"
           prompt: |
-            Review this pull request using the project's code-review skill at
-            .claude/skills/code-review/SKILL.md.
+            You are the automated reviewer for PR #${{ github.event.pull_request.number }}
+            in ${{ github.repository }}. Review the changes and POST a real GitHub PR
+            review with inline, line-by-line comments. Do NOT modify code — review only.
 
-            Apply the three lenses in order — (1) correctness & business logic,
-            (2) Vue patterns & design fidelity, (3) architecture & quality —
-            and honour this repo's rules in CLAUDE.md and the ADRs in doc/.
+            ## Steps (follow exactly)
+            1. Read the rubric: .claude/skills/code-review/SKILL.md.
+            2. Get the diff and changed files:
+                 gh pr diff ${{ github.event.pull_request.number }}
+                 gh pr view ${{ github.event.pull_request.number }} --json files
+            3. Review through three lenses, in order:
+                 (1) correctness & business logic, (2) Vue patterns & design
+                 fidelity, (3) architecture & quality.
+               Honour CLAUDE.md and the ADRs in doc/. Weight the graded business
+               rules: prices read from src/mocks/event.js; VIP 10% discount on
+               workshops only; shipping address required only when merchandise is
+               selected; capacity/overlap availability; validation deferred to
+               submit (never gate navigation).
+            4. For each finding, note the file path and the line number on the
+               NEW side of the diff (side=RIGHT). Tag severity 🔴 blocker /
+               🟡 should-fix / 🟣 nit. Cap nits at 5.
 
-            Pay special attention to the graded business rules: prices read from
-            src/mocks/event.js, VIP 10% discount on workshops only, conditional
-            shipping-address-required-when-merch, capacity/overlap availability,
-            and deferred submit-time validation (never gate navigation).
+            ## Posting the review (MANDATORY — every run, even a clean pass)
+            Build a JSON payload and post ONE review via the reviews API. Map
+            each finding to an inline comment; put the summary table in `body`.
 
-            Post findings as inline PR review comments, each tagged 🔴 / 🟡 / 🟣
-            with file:line and a one-line reason. Cap nits at 5. End with the
-            review-summary table and a `VERDICT: pass | changes-requested` line.
-            Do not modify code — review only.
+                cat > /tmp/review.json <<'JSON'
+                {
+                  "event": "COMMENT",
+                  "body": "<summary table + a `VERDICT: pass | changes-requested` line>",
+                  "comments": [
+                    { "path": "src/...", "line": 42, "side": "RIGHT", "body": "🟡 <reason>" }
+                  ]
+                }
+                JSON
+                gh api --method POST \
+                  "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews" \
+                  --input /tmp/review.json
+
+            Rules:
+            - Use event "REQUEST_CHANGES" if there is any 🔴 blocker, else "COMMENT".
+            - If there are zero findings, still post the review with an empty
+              "comments" array and a body stating the PR looks good + VERDICT: pass.
+            - If the inline POST fails (e.g. a line isn't part of the diff), retry
+              once with only the comments that map to changed lines; if it still
+              fails, fall back to a single visible summary comment:
+                 gh pr comment ${{ github.event.pull_request.number }} --body-file /tmp/summary.md
+            - You MUST end the run having posted at least one visible review or
+              comment to the PR. Do not finish silently.
