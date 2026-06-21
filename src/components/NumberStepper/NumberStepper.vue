@@ -49,7 +49,7 @@ function increment(): void {
         <button
           type="button"
           aria-label="Decrease quantity"
-          class="border-neutral-muted bg-surface-l0 text-neutral flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border text-base leading-none disabled:cursor-not-allowed disabled:opacity-40"
+          class="bg-surface-l2 text-neutral flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 text-base leading-none disabled:cursor-not-allowed disabled:opacity-40"
           :disabled="disabled || atMin"
           @click="decrement"
         >
@@ -67,7 +67,7 @@ function increment(): void {
         <button
           type="button"
           aria-label="Increase quantity"
-          class="border-neutral-muted bg-surface-l0 text-neutral flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border text-base leading-none disabled:cursor-not-allowed disabled:opacity-40"
+          class="bg-surface-l2 text-neutral flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 text-base leading-none disabled:cursor-not-allowed disabled:opacity-40"
           :disabled="disabled || atMax"
           @click="increment"
         >

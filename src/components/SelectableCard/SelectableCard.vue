@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import Paper from 'src/components/Paper/Paper.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -18,6 +17,20 @@ const emit = defineEmits<{ select: [] }>()
 
 const selectable = computed(() => !props.disabled && !props.full)
 
+// Static so UnoCSS keeps every class.
+const SURFACE = {
+  0: 'bg-surface-l0',
+  1: 'bg-surface-l1',
+  2: 'bg-surface-l2',
+  3: 'bg-surface-l3',
+} as const
+
+const cardClass = computed(() => {
+  if (props.selected) return 'bg-brand-subtle-rest border-2 border-brand-emphasis'
+  if (props.disabled || props.full) return 'bg-surface-l2 border border-neutral-muted'
+  return `${SURFACE[props.level]} border border-neutral-muted`
+})
+
 function activate(): void {
   if (selectable.value) emit('select')
 }
@@ -30,25 +43,16 @@ function onKeydown(event: KeyboardEvent): void {
 </script>
 
 <template>
-  <Paper
-    :level="level"
-    :bordered="false"
-    padding="md"
+  <div
     role="button"
     :aria-pressed="selected"
     :aria-disabled="disabled || full"
     :tabindex="selectable ? 0 : -1"
-    class="block shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)] transition-colors"
-    :class="[
-      selected
-        ? 'border-brand-emphasis bg-brand-subtle-rest border-2'
-        : 'border-neutral-muted border',
-      !selected && (disabled || full) ? 'bg-surface-l2' : '',
-      selectable ? 'cursor-pointer hover:bg-surface-l1' : 'cursor-not-allowed opacity-70',
-    ]"
+    class="block rounded-md p-4 shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)] transition-colors"
+    :class="[cardClass, selectable ? 'cursor-pointer' : 'cursor-not-allowed opacity-70']"
     @click="activate"
     @keydown="onKeydown"
   >
     <slot />
-  </Paper>
+  </div>
 </template>
