@@ -83,6 +83,8 @@ jobs:
                (changes-requested only if there is a 🔴 blocker).
 
       # Deterministic: ALWAYS post the review (or a clear fallback note).
+      # Sticky: edit this run's prior review comment instead of stacking a new
+      # one on every push; create it the first time.
       - name: Post review comment
         if: always()
         env:
@@ -94,10 +96,12 @@ jobs:
             if [ -s review-output.md ]; then
               cat review-output.md
             else
-              echo "⚠️ The reviewer produced no output this run. Check the"
-              echo "\`Generate review\` step logs."
+              echo "⚠️ No review was produced — the \`Generate review\` step"
+              echo "errored or timed out (commonly an expired"
+              echo "\`CLAUDE_CODE_OAUTH_TOKEN\`). See that step's logs."
             fi
             echo
-            echo "_Automated — posted by the claude-review workflow._"
+            echo "_Automated — posted by the claude-review workflow (updated in place)._"
           } > review-body.md
-          gh pr comment ${{ github.event.pull_request.number }} --body-file review-body.md
+          gh pr comment ${{ github.event.pull_request.number }} --body-file review-body.md --edit-last \
+            || gh pr comment ${{ github.event.pull_request.number }} --body-file review-body.md
