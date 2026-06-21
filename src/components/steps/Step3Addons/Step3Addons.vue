@@ -181,9 +181,13 @@ function sizeOptions(item: MerchandiseAddon): Array<{ label: string; value: stri
           variant="info"
           icon="info"
         >
-          <span class="font-semibold">Shipping Information</span><br>
-          Merchandise items will be shipped to your address one week before the conference. Please ensure
-          your shipping address in Step 1 is correct.
+          <p class="font-semibold">
+            Shipping Information
+          </p>
+          <p class="mt-1">
+            Merchandise items will be shipped to your address one week before the conference. Please
+            ensure your shipping address in Step 1 is correct.
+          </p>
         </Banner>
 
         <SelectableCard

@@ -10,8 +10,8 @@ const props = withDefaults(
 )
 
 const VARIANT = {
-  info: { box: 'bg-info-muted-rest text-info-emphasis', role: 'status' },
-  warning: { box: 'bg-warning-muted-rest text-warning-emphasis', role: 'alert' },
+  info: { box: 'bg-info-subtle-rest border-info-opacity', icon: 'text-info', role: 'status' },
+  warning: { box: 'bg-warning-subtle-rest border-warning-opacity', icon: 'text-warning', role: 'alert' },
 } as const
 
 const appearance = computed(() => VARIANT[props.variant])
@@ -19,7 +19,7 @@ const appearance = computed(() => VARIANT[props.variant])
 
 <template>
   <div
-    class="flex items-start gap-2 rounded-md p-3"
+    class="text-neutral flex gap-3 rounded-lg border p-4"
     :class="appearance.box"
     :role="appearance.role"
   >
@@ -27,9 +27,10 @@ const appearance = computed(() => VARIANT[props.variant])
       v-if="icon"
       :name="icon"
       size="20px"
-      class="mt-0.5"
+      class="mt-0.5 shrink-0"
+      :class="appearance.icon"
     />
-    <div class="flex-1 text-sm">
+    <div class="flex-1 text-[14px] leading-5">
       <slot />
     </div>
     <div v-if="$slots.actions">
