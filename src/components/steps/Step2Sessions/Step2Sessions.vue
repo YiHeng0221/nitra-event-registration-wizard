@@ -16,31 +16,47 @@ const activeDay = ref(days[0] ?? '')
 
 const visibleSessions = computed<Session[]>(() => sessionsByDay[activeDay.value] ?? [])
 
-/** Track badge colour, by track. */
+/** Track badge colours (bg + text), by track. */
 const TRACK_CLASS: Record<SessionTrack, string> = {
-  main: 'bg-surface-l2 text-neutral-muted',
-  frontend: 'bg-accent-muted-rest text-accent-emphasis',
-  backend: 'bg-info-muted-rest text-info-emphasis',
-  devops: 'bg-warning-muted-rest text-warning-emphasis',
+  main: 'bg-gray-50 text-gray-700',
+  frontend: 'bg-orange-50 text-orange-600',
+  backend: 'bg-blue-50 text-blue-600',
+  devops: 'bg-yellow-200 text-yellow-900',
 }
 
 function isSelected(id: string): boolean {
   return state.selectedSessionIds.includes(id)
 }
-
+function isFull(session: Session): boolean {
+  return fullSessionIds.value.has(session.id)
+}
 function toggle(session: Session): void {
-  if (fullSessionIds.value.has(session.id)) return
+  if (isFull(session)) return
   const index = state.selectedSessionIds.indexOf(session.id)
   if (index >= 0) state.selectedSessionIds.splice(index, 1)
   else state.selectedSessionIds.push(session.id)
 }
-
 function spotsLeft(session: Session): number {
   return Math.max(session.capacity - session.registered, 0)
 }
-
 function fillPercent(session: Session): number {
   return Math.min(Math.round((session.registered / session.capacity) * 100), 100)
+}
+
+/** Capacity bar fill colour by how full the session is. */
+function barClass(session: Session): string {
+  if (isFull(session)) return 'bg-danger-emphasis-rest'
+  const fill = fillPercent(session)
+  if (fill >= 70) return 'bg-orange-600'
+  if (fill >= 50) return 'bg-yellow-800'
+  return 'bg-[var(--bg-brand-emphasis-rest)]'
+}
+function spotsClass(session: Session): string {
+  if (isFull(session)) return 'text-danger-emphasis'
+  const fill = fillPercent(session)
+  if (fill >= 70) return 'text-orange-700'
+  if (fill >= 50) return 'text-yellow-800'
+  return 'text-[var(--bg-brand-emphasis-rest)]'
 }
 </script>
 
@@ -53,7 +69,7 @@ function fillPercent(session: Session): number {
     <div
       role="radiogroup"
       aria-label="Conference day"
-      class="bg-surface-l2 inline-flex w-fit gap-1 rounded-lg p-1"
+      class="bg-surface-l2 inline-flex w-fit gap-1 rounded-md p-1"
     >
       <button
         v-for="day in days"
@@ -61,7 +77,7 @@ function fillPercent(session: Session): number {
         type="button"
         role="radio"
         :aria-checked="activeDay === day"
-        class="cursor-pointer rounded-md border-0 bg-transparent px-3 py-1 text-subtitle2 transition-colors"
+        class="cursor-pointer rounded-md border-0 bg-transparent px-3 py-1.5 text-[14px] font-semibold transition-colors"
         :class="
           activeDay === day
             ? 'bg-brand-emphasis-rest text-inverse'
@@ -81,47 +97,47 @@ function fillPercent(session: Session): number {
       <SelectableCard
         v-for="session in visibleSessions"
         :key="session.id"
-        subtle
+        :level="0"
         :selected="isSelected(session.id)"
-        :full="fullSessionIds.has(session.id)"
+        :full="isFull(session)"
         @select="toggle(session)"
       >
-        <div class="flex items-start justify-between gap-2">
+        <div class="flex items-center justify-between gap-2">
           <span
-            class="rounded-full px-2 py-0.5 text-xs font-medium uppercase"
+            class="rounded-full px-[6px] py-[3px] text-[11px] font-medium uppercase"
             :class="TRACK_CLASS[session.track]"
           >
             {{ session.track }}
           </span>
           <q-icon
             :name="isSelected(session.id) ? 'check_box' : 'check_box_outline_blank'"
-            size="20px"
-            :class="isSelected(session.id) ? 'text-[var(--bg-brand-emphasis-rest)]' : 'text-neutral-quiet'"
+            size="18px"
+            :class="isSelected(session.id) ? 'text-[var(--bg-brand-emphasis-rest)]' : 'text-gray-700'"
           />
         </div>
 
         <h3 class="text-subtitle1 text-neutral mt-2 font-semibold">
           {{ session.title }}
         </h3>
-        <p class="text-neutral-muted text-sm">
+        <p class="text-neutral-muted text-[12px]">
           {{ session.speaker }}, {{ session.speakerTitle }}
         </p>
-        <p class="text-neutral-muted mt-1 text-sm">
+        <p class="text-neutral-quiet mt-1 text-[11px]">
           {{ formatTimeRange(session.date, session.endDate) }}
         </p>
 
-        <div class="bg-surface-l3 mt-3 h-1.5 overflow-hidden rounded-full">
+        <div class="bg-surface-l2 mt-3 h-[6px] overflow-hidden rounded-full">
           <div
             class="h-full rounded-full"
-            :class="fullSessionIds.has(session.id) ? 'bg-danger-emphasis-rest' : 'bg-accent-emphasis-rest'"
+            :class="barClass(session)"
             :style="{ width: `${fillPercent(session)}%` }"
           />
         </div>
         <p
-          class="mt-1 text-xs font-medium"
-          :class="fullSessionIds.has(session.id) ? 'text-danger' : 'text-accent-emphasis'"
+          class="mt-1 text-[11px] font-medium"
+          :class="spotsClass(session)"
         >
-          {{ fullSessionIds.has(session.id) ? 'Sold Out' : `${spotsLeft(session)} spots left` }}
+          {{ isFull(session) ? 'Sold Out' : `${spotsLeft(session)} spots left` }}
         </p>
       </SelectableCard>
     </div>
