@@ -7,7 +7,6 @@ import { formatTimeRange } from 'src/utils/datetime'
 import type { WorkshopAddon, MealAddon, MerchandiseAddon } from 'src/types/addon'
 import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
 import NumberStepper from 'src/components/NumberStepper/NumberStepper.vue'
-import AppSelect from 'src/components/AppSelect/AppSelect.vue'
 import Banner from 'src/components/Banner/Banner.vue'
 import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
 
@@ -71,9 +70,6 @@ function sizeOf(id: string): string | null {
 function setSize(id: string, size: string | number | null): void {
   const entry = state.merchandise[id]
   if (entry) entry.size = size === null ? null : String(size)
-}
-function sizeOptions(item: MerchandiseAddon): Array<{ label: string; value: string }> {
-  return (item.sizes ?? []).map((size) => ({ label: size, value: size }))
 }
 </script>
 
@@ -210,32 +206,48 @@ function sizeOptions(item: MerchandiseAddon): Array<{ label: string; value: stri
               v-if="item.sizes"
               class="flex items-center gap-2"
             >
-              <span class="text-neutral-muted text-sm">Size</span>
-              <AppSelect
-                class="w-24"
-                :model-value="sizeOf(item.id)"
-                :options="sizeOptions(item)"
-                placeholder="Select"
-                @update:model-value="setSize(item.id, $event)"
-              />
+              <span class="text-neutral-muted text-[12px] font-medium">Size:</span>
+              <select
+                class="bg-surface-l0 border-neutral-muted text-neutral rounded-md border px-3 py-1.5 text-[12px] font-medium outline-none"
+                :value="sizeOf(item.id) ?? ''"
+                @change="setSize(item.id, ($event.target as HTMLSelectElement).value)"
+              >
+                <option
+                  value=""
+                  disabled
+                >
+                  Select
+                </option>
+                <option
+                  v-for="size in item.sizes"
+                  :key="size"
+                  :value="size"
+                >
+                  {{ size }}
+                </option>
+              </select>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-neutral-muted text-sm">Qty</span>
+              <span class="text-neutral-muted text-[12px] font-medium">Qty:</span>
               <NumberStepper
                 :model-value="quantityOf(item.id)"
                 :min="0"
                 :max="item.maxQuantity"
                 @update:model-value="setQuantity(item, $event)"
               />
-              <span class="text-neutral-quiet text-xs">max {{ item.maxQuantity }}</span>
+              <span class="text-neutral-quiet text-[10px]">max {{ item.maxQuantity }}</span>
             </div>
           </div>
 
           <p
             v-if="quantityOf(item.id) > 0"
-            class="text-success-emphasis mt-2 text-xs font-medium"
+            class="text-[var(--bg-brand-emphasis-rest)] mt-2 flex items-center gap-1 text-[11px] font-medium"
           >
-            ✓ Added to order
+            <q-icon
+              name="check"
+              size="14px"
+            />
+            Added to order
           </p>
         </SelectableCard>
       </div>
