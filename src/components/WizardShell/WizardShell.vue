@@ -1,32 +1,47 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useValidation, type ValidationResult } from 'src/composables/useValidation'
+import AppHeader from 'src/components/AppHeader/AppHeader.vue'
+import Stepper, { type StepItem } from 'src/components/Stepper/Stepper.vue'
 
 const emit = defineEmits<{ submit: [] }>()
 
-/** The four wizard steps; `slot` names the content slot a parent fills in. */
-const STEPS = [
-  { step: 1, title: 'Attendee', slot: 'step-attendee' },
-  { step: 2, title: 'Sessions', slot: 'step-sessions' },
-  { step: 3, title: 'Add-ons', slot: 'step-addons' },
-  { step: 4, title: 'Review', slot: 'step-review' },
-] as const
+const STEPS: StepItem[] = [
+  { n: 1, label: 'Attendee Info' },
+  { n: 2, label: 'Sessions' },
+  { n: 3, label: 'Add-ons' },
+  { n: 4, label: 'Review' },
+]
+
+/** Contextual label for the primary action, by current step. */
+const NEXT_LABEL: Record<number, string> = {
+  1: 'Next: Session Selection',
+  2: 'Next: Add-ons',
+  3: 'Next: Review',
+}
 
 const { state } = useRegistration()
 const { validateAll } = useValidation()
 
-// Last submit-time validation; drives the per-step error badges.
 const lastValidation = ref<ValidationResult | null>(null)
+const errorSteps = computed(() =>
+  Object.entries(lastValidation.value?.stepHasError ?? {})
+    .filter(([, hasError]) => hasError)
+    .map(([step]) => Number(step)),
+)
 
+const isLastStep = computed(() => state.currentStep >= STEPS.length)
+
+function goTo(step: number): void {
+  state.currentStep = step
+}
 function goNext(): void {
   if (state.currentStep < STEPS.length) state.currentStep += 1
 }
-
 function goBack(): void {
   if (state.currentStep > 1) state.currentStep -= 1
 }
-
 function submit(): void {
   const result = validateAll()
   lastValidation.value = result
@@ -36,62 +51,81 @@ function submit(): void {
   }
   emit('submit')
 }
-
-function stepHasError(step: number): boolean {
-  return Boolean(lastValidation.value?.stepHasError[step])
-}
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 lg:flex-row lg:items-start">
-    <div class="flex-1">
-      <q-stepper
-        v-model="state.currentStep"
-        flat
-        animated
-        header-nav
-        class="bg-surface-l0"
-      >
-        <q-step
-          v-for="entry in STEPS"
-          :key="entry.step"
-          :name="entry.step"
-          :title="entry.title"
-          :error="stepHasError(entry.step)"
-          :done="state.currentStep > entry.step"
-        >
-          <slot :name="entry.slot">
-            <div class="text-neutral-muted">
-              {{ entry.title }} — coming soon
-            </div>
-          </slot>
-        </q-step>
-      </q-stepper>
+  <div class="bg-surface-l0 overflow-hidden rounded-xl">
+    <!-- Header -->
+    <AppHeader />
+    <div class="border-neutral-muted border-t" />
 
-      <div class="mt-4 flex justify-between">
-        <q-btn
-          flat
-          label="Back"
-          :disable="state.currentStep === 1"
-          @click="goBack"
-        />
-        <q-btn
-          v-if="state.currentStep < STEPS.length"
-          color="primary"
-          label="Next"
-          @click="goNext"
-        />
-        <q-btn
-          v-else
-          color="primary"
-          label="Submit"
-          @click="submit"
-        />
-      </div>
+    <!-- Stepper -->
+    <div class="px-6 py-6 lg:px-30">
+      <Stepper
+        :steps="STEPS"
+        :current="state.currentStep"
+        :error-steps="errorSteps"
+        @navigate="goTo"
+      />
     </div>
+    <div class="border-neutral-muted border-t" />
 
-    <aside class="w-full lg:w-80">
-      <slot name="summary" />
-    </aside>
+    <!-- Form -->
+    <div class="px-6 py-10 lg:px-30">
+      <Transition
+        name="fade"
+        mode="out-in"
+      >
+        <slot
+          v-if="state.currentStep === 1"
+          name="step-attendee"
+        />
+        <slot
+          v-else-if="state.currentStep === 2"
+          name="step-sessions"
+        />
+        <slot
+          v-else-if="state.currentStep === 3"
+          name="step-addons"
+        />
+        <slot
+          v-else
+          name="step-review"
+        />
+      </Transition>
+    </div>
+    <div class="border-neutral-muted border-t" />
+
+    <!-- Actions -->
+    <div class="flex items-center justify-between px-6 py-6 lg:px-30">
+      <button
+        v-if="state.currentStep > 1"
+        type="button"
+        class="text-neutral text-subtitle2 bg-surface-l2 hover:bg-surface-l3 cursor-pointer rounded-md border-0 px-4 py-2 font-medium"
+        @click="goBack"
+      >
+        Back
+      </button>
+      <span v-else />
+
+      <button
+        type="button"
+        class="bg-accent-emphasis-rest hover:bg-accent-emphasis-hover text-inverse text-subtitle2 cursor-pointer rounded-md border-0 px-5 py-2 font-medium"
+        @click="isLastStep ? submit() : goNext()"
+      >
+        {{ isLastStep ? 'Submit Registration' : NEXT_LABEL[state.currentStep] }}
+      </button>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
