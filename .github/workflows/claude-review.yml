@@ -54,7 +54,7 @@ jobs:
           claude_args: >-
             --model sonnet
             --setting-sources project
-            --allowedTools "Read,Grep,Glob,Write"
+            --allowedTools "Read,Grep,Glob,Write(review-output.md)"
           prompt: |
             Review this pull request and WRITE your review to the file
             `review-output.md` in the repo root using the Write tool. Do NOT
@@ -93,7 +93,7 @@ jobs:
           {
             echo "## 🤖 Claude code review"
             echo
-            if [ -s review-output.md ]; then
+            if [ -f review-output.md ] && grep -q '[^[:space:]]' review-output.md; then
               cat review-output.md
             else
               echo "⚠️ No review was produced — the \`Generate review\` step"
