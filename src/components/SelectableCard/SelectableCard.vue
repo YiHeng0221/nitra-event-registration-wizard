@@ -10,8 +10,10 @@ const props = withDefaults(
     full?: boolean
     /** Surface level when unselected (tickets use 1, sessions use 0). */
     level?: 0 | 1 | 2 | 3
+    /** Inner content gap in 4px units (default 2 → 8px; tickets use 3 → 12px). */
+    gap?: number
   }>(),
-  { level: 1 },
+  { level: 1, gap: 2 },
 )
 
 const emit = defineEmits<{ select: [] }>()
@@ -56,7 +58,7 @@ function onKeydown(event: KeyboardEvent): void {
     @click="activate"
     @keydown="onKeydown"
   >
-    <VStack :gap="2">
+    <VStack :gap="gap">
       <slot />
     </VStack>
   </div>

@@ -35,6 +35,7 @@ const tickets = loadTicketTypes()
           v-for="ticket in tickets"
           :key="ticket.id"
           :selected="state.ticketId === ticket.id"
+          :gap="3"
           class="h-[288px]"
           @select="state.ticketId = ticket.id"
         >

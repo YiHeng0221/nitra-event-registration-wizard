@@ -12,6 +12,7 @@ import Paper from 'src/components/Paper/Paper.vue'
 import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
 import ErrorBanner from 'src/components/ErrorBanner/ErrorBanner.vue'
 import Text from 'src/components/Text/Text.vue'
+import VStack from 'src/components/Stack/VStack.vue'
 
 const { state } = useRegistration()
 const { formatCurrency } = usePricing()
@@ -154,35 +155,37 @@ function sectionErrorClass(step: number): string {
           Edit → Step 2
         </button>
       </div>
-      <Text
-        v-if="selectedSessions.length === 0"
-        variant="body"
-        color="muted"
-      >
-        No sessions selected.
-      </Text>
-      <div
-        v-for="session in selectedSessions"
-        :key="session.id"
-        class="flex items-center justify-between gap-4"
-      >
+      <VStack :gap="2">
         <Text
-          as="span"
+          v-if="selectedSessions.length === 0"
           variant="body"
           color="muted"
-          nowrap
         >
-          {{ formatDateTime(session.date) }}
+          No sessions selected.
         </Text>
-        <Text
-          as="span"
-          variant="body"
-          color="neutral"
-          class="text-right"
+        <div
+          v-for="session in selectedSessions"
+          :key="session.id"
+          class="flex items-center justify-between gap-4"
         >
-          {{ session.title }}
-        </Text>
-      </div>
+          <Text
+            as="span"
+            variant="body"
+            color="muted"
+            nowrap
+          >
+            {{ formatDateTime(session.date) }}
+          </Text>
+          <Text
+            as="span"
+            variant="body"
+            color="neutral"
+            class="text-right"
+          >
+            {{ session.title }}
+          </Text>
+        </div>
+      </VStack>
     </Paper>
 
     <Paper
@@ -205,34 +208,36 @@ function sectionErrorClass(step: number): string {
           Edit → Step 3
         </button>
       </div>
-      <Text
-        v-if="addonRows.length === 0"
-        variant="body"
-        color="muted"
-      >
-        No add-ons selected.
-      </Text>
-      <div
-        v-for="(row, index) in addonRows"
-        :key="index"
-        class="flex items-center justify-between gap-4"
-      >
+      <VStack :gap="2">
         <Text
-          as="span"
+          v-if="addonRows.length === 0"
           variant="body"
           color="muted"
         >
-          {{ row.type }}
+          No add-ons selected.
         </Text>
-        <Text
-          as="span"
-          variant="body"
-          color="neutral"
-          class="text-right"
+        <div
+          v-for="(row, index) in addonRows"
+          :key="index"
+          class="flex items-center justify-between gap-4"
         >
-          {{ row.label }}
-        </Text>
-      </div>
+          <Text
+            as="span"
+            variant="body"
+            color="muted"
+          >
+            {{ row.type }}
+          </Text>
+          <Text
+            as="span"
+            variant="body"
+            color="neutral"
+            class="text-right"
+          >
+            {{ row.label }}
+          </Text>
+        </div>
+      </VStack>
     </Paper>
 
     <OrderSummary
