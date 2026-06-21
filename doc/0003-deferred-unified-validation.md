@@ -14,6 +14,17 @@ session is shown unavailable/disabled. We need an architecture that keeps naviga
 all data, validates everything exactly once at submit, and still reflects live availability — without
 tangling the two concepts.
 
+**Figma vs. spec — overlapping sessions.** The Figma mock shows a Step 2 session that overlaps an
+already-selected session as **disabled** (the same treatment as an overlapping workshop in Step 3).
+The written spec deliberately says the opposite for sessions: README §Step 2-2 — *"users may freely
+select any available sessions. Time-conflict validation is deferred to Step 4 submit time"* — and
+§Step 2-3 makes capacity the **only** thing that disables a session. We follow the **spec, not the
+Figma frame**: sessions stay freely selectable, and a session↔session overlap is surfaced as a
+**red border + inline error hint** on the offending cards (plus the Step 2 stepper badge and the
+review banner) — never as a disabled control. Only workshop↔session overlap disables (Step 3, per
+§Step 3-2). This keeps the deliberate "free selection / deferred validation" behaviour the spec calls
+for while still giving the user the visual signal the Figma intent was after.
+
 ## Decision
 
 Separate **availability** (live) from **validation** (deferred):
@@ -27,6 +38,13 @@ Separate **availability** (live) from **validation** (deferred):
   schemas (ADR-0002) with pure time-conflict detection over the selected session set, aggregates the
   results into one error map, marks which steps carry errors, and returns the earliest faulty step to
   jump to. Forward navigation is never gated by validation.
+- **Errors are hidden until the first submit, then re-evaluate live.** A module-level
+  `hasAttemptedSubmit` flag stays `false` until `validateAll()` runs, so nothing is flagged during the
+  initial happy-path pass. Once the user has submitted, the error map, step badges, field hints, and
+  the session-conflict markers become a `computed` over the store — so the moment the user fixes a
+  required field or re-picks sessions to remove an overlap, the red border / hint clears without a
+  second submit. This is still *display* only; it never gates navigation, so the spec's "free
+  selection" rule holds. `resetValidation()` returns to the pristine (no-errors) state on Back to Home.
 
 ## Options considered
 

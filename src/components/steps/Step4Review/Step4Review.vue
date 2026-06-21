@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRegistration } from 'src/composables/useRegistration'
 import { usePricing } from 'src/composables/usePricing'
+import { useValidation } from 'src/composables/useValidation'
 import { loadTicketTypes } from 'src/data/tickets'
 import { loadSessions } from 'src/data/sessions'
 import { loadAddons } from 'src/data/addons'
@@ -9,24 +10,45 @@ import { formatDateTime } from 'src/utils/datetime'
 import type { Session } from 'src/types/session'
 import Paper from 'src/components/Paper/Paper.vue'
 import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
+import ErrorBanner from 'src/components/ErrorBanner/ErrorBanner.vue'
+import Text from 'src/components/Text/Text.vue'
+import VStack from 'src/components/Stack/VStack.vue'
 
 const { state } = useRegistration()
 const { formatCurrency } = usePricing()
+const { errorList } = useValidation()
 const tickets = loadTicketTypes()
 const sessionById = new Map(loadSessions().map((session) => [session.id, session]))
 const addonById = new Map(loadAddons().map((addon) => [addon.id, addon]))
 
 const ticket = computed(() => tickets.find((entry) => entry.id === state.ticketId) ?? null)
 
-const attendeeRows = computed(() => [
-  { label: 'Name', value: state.attendee.fullName },
-  { label: 'Email', value: state.attendee.email },
-  { label: 'Phone', value: state.attendee.phone },
-  { label: 'Company', value: state.attendee.company },
-  { label: 'Job Title', value: state.attendee.jobTitle },
+// Shipping is required only once merchandise is in the order (mirrors registrationSchema).
+const merchSelected = computed(() => Object.keys(state.merchandise).length > 0)
+
+interface AttendeeRow {
+  label: string
+  value: string
+  required: boolean
+  /** Placeholder shown when required and empty. */
+  missingText?: string
+}
+const attendeeRows = computed<AttendeeRow[]>(() => [
+  { label: 'Name', value: state.attendee.fullName, required: true },
+  { label: 'Email', value: state.attendee.email, required: true },
+  { label: 'Phone', value: state.attendee.phone, required: true },
+  { label: 'Company', value: state.attendee.company, required: true },
+  { label: 'Job Title', value: state.attendee.jobTitle, required: true },
   {
     label: 'Ticket Type',
-    value: ticket.value ? `${ticket.value.name} (${formatCurrency(ticket.value.price)})` : '—',
+    value: ticket.value ? `${ticket.value.name} (${formatCurrency(ticket.value.price)})` : '',
+    required: true,
+  },
+  {
+    label: 'Shipping Address',
+    value: state.attendee.shippingAddress,
+    required: merchSelected.value,
+    missingText: '— (required for merchandise)',
   },
 ])
 
@@ -62,22 +84,45 @@ const addonRows = computed<AddonRow[]>(() => {
 function editStep(step: number): void {
   state.currentStep = step
 }
+
+/** Red border on a review section when its step has unmet required fields. */
+function sectionErrorClass(step: number): string {
+  return errorList.value.some((item) => item.step === step)
+    ? 'border-2 border-solid border-[color:var(--border-danger-emphasis)]'
+    : ''
+}
 </script>
 
 <template>
   <div class="flex flex-col gap-6">
-    <h2 class="text-h6 text-neutral font-bold">
+    <Text
+      as="h2"
+      variant="h4"
+      color="neutral"
+    >
       Review Your Registration
-    </h2>
+    </Text>
 
-    <Paper :level="1">
+    <ErrorBanner
+      v-if="errorList.length > 0"
+      :items="errorList"
+    />
+
+    <Paper
+      :level="1"
+      :class="sectionErrorClass(1)"
+    >
       <div class="mb-3 flex items-center justify-between">
-        <h3 class="text-subtitle1 text-neutral font-semibold">
+        <Text
+          as="h3"
+          variant="subtitle1"
+          color="neutral"
+        >
           Attendee Information
-        </h3>
+        </Text>
         <button
           type="button"
-          class="text-brand cursor-pointer border-0 bg-transparent text-sm font-medium underline-offset-2 hover:underline"
+          class="text-brand cursor-pointer border-0 bg-transparent underline-offset-2 hover:underline"
           @click="editStep(1)"
         >
           Edit → Step 1
@@ -87,74 +132,129 @@ function editStep(step: number): void {
         <div
           v-for="row in attendeeRows"
           :key="row.label"
-          class="flex items-center justify-between text-sm"
+          class="flex items-center justify-between"
         >
-          <dt class="text-neutral-muted">
+          <Text
+            as="dt"
+            variant="body"
+            color="muted"
+          >
             {{ row.label }}
-          </dt>
-          <dd class="text-neutral">
-            {{ row.value || '—' }}
-          </dd>
+          </Text>
+          <Text
+            as="dd"
+            variant="body"
+            :class="row.required && !row.value ? 'text-danger' : 'text-neutral'"
+          >
+            {{ row.required && !row.value ? (row.missingText ?? '— (required)') : row.value || '—' }}
+          </Text>
         </div>
       </dl>
     </Paper>
 
-    <Paper :level="1">
+    <Paper
+      :level="1"
+      :class="sectionErrorClass(2)"
+    >
       <div class="mb-3 flex items-center justify-between">
-        <h3 class="text-subtitle1 text-neutral font-semibold">
+        <Text
+          as="h3"
+          variant="subtitle1"
+          color="neutral"
+        >
           Selected Sessions
-        </h3>
+        </Text>
         <button
           type="button"
-          class="text-brand cursor-pointer border-0 bg-transparent text-sm font-medium underline-offset-2 hover:underline"
+          class="text-brand cursor-pointer border-0 bg-transparent underline-offset-2 hover:underline"
           @click="editStep(2)"
         >
           Edit → Step 2
         </button>
       </div>
-      <p
-        v-if="selectedSessions.length === 0"
-        class="text-neutral-muted text-sm"
-      >
-        No sessions selected.
-      </p>
-      <div
-        v-for="session in selectedSessions"
-        :key="session.id"
-        class="flex items-center justify-between gap-4 text-sm"
-      >
-        <span class="text-neutral-muted whitespace-nowrap">{{ formatDateTime(session.date) }}</span>
-        <span class="text-neutral text-right">{{ session.title }}</span>
-      </div>
+      <VStack :gap="2">
+        <Text
+          v-if="selectedSessions.length === 0"
+          variant="body"
+          color="muted"
+        >
+          No sessions selected.
+        </Text>
+        <div
+          v-for="session in selectedSessions"
+          :key="session.id"
+          class="flex items-center justify-between gap-4"
+        >
+          <Text
+            as="span"
+            variant="body"
+            color="muted"
+            nowrap
+          >
+            {{ formatDateTime(session.date) }}
+          </Text>
+          <Text
+            as="span"
+            variant="body"
+            color="neutral"
+            class="text-right"
+          >
+            {{ session.title }}
+          </Text>
+        </div>
+      </VStack>
     </Paper>
 
-    <Paper :level="1">
+    <Paper
+      :level="1"
+      :class="sectionErrorClass(3)"
+    >
       <div class="mb-3 flex items-center justify-between">
-        <h3 class="text-subtitle1 text-neutral font-semibold">
+        <Text
+          as="h3"
+          variant="subtitle1"
+          color="neutral"
+        >
           Add-ons
-        </h3>
+        </Text>
         <button
           type="button"
-          class="text-brand cursor-pointer border-0 bg-transparent text-sm font-medium underline-offset-2 hover:underline"
+          class="text-brand cursor-pointer border-0 bg-transparent underline-offset-2 hover:underline"
           @click="editStep(3)"
         >
           Edit → Step 3
         </button>
       </div>
-      <p
-        v-if="addonRows.length === 0"
-        class="text-neutral-muted text-sm"
-      >
-        No add-ons selected.
-      </p>
-      <div
-        v-for="(row, index) in addonRows"
-        :key="index"
-        class="flex items-center justify-between gap-4 text-sm"
-      >
-        <span class="text-neutral-muted">{{ row.type }}</span>
-        <span class="text-neutral text-right">{{ row.label }}</span>
-      </div>
+      <VStack :gap="2">
+        <Text
+          v-if="addonRows.length === 0"
+          variant="body"
+          color="muted"
+        >
+          No add-ons selected.
+        </Text>
+        <div
+          v-for="(row, index) in addonRows"
+          :key="index"
+          class="flex items-center justify-between gap-4"
+        >
+          <Text
+            as="span"
+            variant="body"
+            color="muted"
+          >
+            {{ row.type }}
+          </Text>
+          <Text
+            as="span"
+            variant="body"
+            color="neutral"
+            class="text-right"
+          >
+            {{ row.label }}
+          </Text>
+        </div>
+      </VStack>
     </Paper>
 
     <OrderSummary

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRegistration } from 'src/composables/useRegistration'
-import { useValidation, type ValidationResult } from 'src/composables/useValidation'
+import { useValidation } from 'src/composables/useValidation'
 import AppHeader from 'src/components/AppHeader/AppHeader.vue'
 import Stepper, { type StepItem } from 'src/components/Stepper/Stepper.vue'
+import Text from 'src/components/Text/Text.vue'
 
 const emit = defineEmits<{ submit: [] }>()
 
@@ -22,11 +23,11 @@ const NEXT_LABEL: Record<number, string> = {
 }
 
 const { state } = useRegistration()
-const { validateAll } = useValidation()
+const { validateAll, stepHasError } = useValidation()
 
-const lastValidation = ref<ValidationResult | null>(null)
+// Reactive: badges clear as soon as the user resolves the error (post-submit).
 const errorSteps = computed(() =>
-  Object.entries(lastValidation.value?.stepHasError ?? {})
+  Object.entries(stepHasError.value)
     .filter(([, hasError]) => hasError)
     .map(([step]) => Number(step)),
 )
@@ -44,34 +45,33 @@ function goBack(): void {
 }
 function submit(): void {
   const result = validateAll()
-  lastValidation.value = result
-  if (!result.valid && result.jumpTo !== null) {
-    state.currentStep = result.jumpTo
-    return
-  }
+  // Stay on Review on failure — the error banner + per-step badges + field hints
+  // surface what's missing (no auto-jump).
+  if (!result.valid) return
   emit('submit')
 }
 </script>
 
 <template>
-  <div class="bg-surface-l0 min-h-screen">
-    <!-- Header -->
-    <AppHeader />
-    <div class="border-neutral-muted border-t" />
+  <div class="bg-surface-l0 flex h-screen flex-col">
+    <!-- Header — 72px -->
+    <AppHeader class="shrink-0" />
+    <div class="bg-[var(--border-neutral-muted)] h-px shrink-0" />
 
-    <!-- Stepper -->
-    <div class="px-6 py-6 lg:px-30">
+    <!-- Stepper — 80px -->
+    <div class="flex h-[80px] shrink-0 items-center px-6 lg:px-30">
       <Stepper
+        class="w-full"
         :steps="STEPS"
         :current="state.currentStep"
         :error-steps="errorSteps"
         @navigate="goTo"
       />
     </div>
-    <div class="border-neutral-muted border-t" />
+    <div class="bg-[var(--border-neutral-muted)] h-px shrink-0" />
 
-    <!-- Form -->
-    <div class="px-6 py-10 lg:px-30">
+    <!-- Form — fills the remaining viewport, scrolls -->
+    <div class="flex-1 overflow-y-auto px-6 py-10 lg:px-30">
       <Transition
         name="fade"
         mode="out-in"
@@ -94,26 +94,38 @@ function submit(): void {
         />
       </Transition>
     </div>
-    <div class="border-neutral-muted border-t" />
+    <div class="bg-[var(--border-neutral-muted)] h-px shrink-0" />
 
-    <!-- Actions -->
-    <div class="flex items-center justify-between px-6 py-6 lg:px-30">
+    <!-- Actions — 72px -->
+    <div class="flex h-[72px] shrink-0 items-center justify-between px-6 lg:px-30">
       <button
         v-if="state.currentStep > 1"
         type="button"
-        class="text-neutral text-subtitle2 bg-surface-l2 hover:bg-surface-l3 cursor-pointer rounded-md border-0 px-4 py-2 font-medium"
+        class="bg-surface-l2 hover:bg-surface-l3 cursor-pointer rounded-md border-0 px-4 py-2"
         @click="goBack"
       >
-        Back
+        <Text
+          as="span"
+          variant="subtitle2"
+          color="neutral"
+        >
+          Back
+        </Text>
       </button>
       <span v-else />
 
       <button
         type="button"
-        class="bg-accent-emphasis-rest hover:bg-accent-emphasis-hover text-inverse text-subtitle2 cursor-pointer rounded-md border-0 px-5 py-2 font-medium"
+        class="bg-accent-emphasis-rest hover:bg-accent-emphasis-hover cursor-pointer rounded-[10px] border-0 px-5 py-2"
         @click="isLastStep ? submit() : goNext()"
       >
-        {{ isLastStep ? 'Submit Registration' : NEXT_LABEL[state.currentStep] }}
+        <Text
+          as="span"
+          variant="subtitle2"
+          color="inverse"
+        >
+          {{ isLastStep ? 'Submit Registration' : NEXT_LABEL[state.currentStep] }}
+        </Text>
       </button>
     </div>
   </div>

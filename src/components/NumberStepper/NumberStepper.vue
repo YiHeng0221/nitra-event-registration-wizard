@@ -43,31 +43,39 @@ function increment(): void {
       <div
         :id="controlId"
         role="group"
-        class="inline-flex items-center gap-2"
+        class="inline-flex items-center gap-1"
         :aria-describedby="describedBy"
       >
-        <q-btn
-          round
-          dense
-          icon="remove"
+        <button
+          type="button"
           aria-label="Decrease quantity"
-          :disable="disabled || atMin"
+          class="bg-surface-l2 text-neutral flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 text-base leading-none disabled:cursor-not-allowed disabled:opacity-40"
+          :disabled="disabled || atMin"
           @click="decrement"
-        />
+        >
+          <q-icon
+            name="remove"
+            size="16px"
+          />
+        </button>
         <span
-          class="min-w-8 text-center text-subtitle1"
+          class="min-w-7 text-center text-subtitle2"
           :class="invalid ? 'text-danger' : 'text-neutral'"
         >
           {{ model }}
         </span>
-        <q-btn
-          round
-          dense
-          icon="add"
+        <button
+          type="button"
           aria-label="Increase quantity"
-          :disable="disabled || atMax"
+          class="bg-surface-l2 text-neutral flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 text-base leading-none disabled:cursor-not-allowed disabled:opacity-40"
+          :disabled="disabled || atMax"
           @click="increment"
-        />
+        >
+          <q-icon
+            name="add"
+            size="16px"
+          />
+        </button>
       </div>
     </template>
   </FieldShell>

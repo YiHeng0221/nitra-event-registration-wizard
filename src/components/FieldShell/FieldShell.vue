@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
+import Text from 'src/components/Text/Text.vue'
 
 const props = defineProps<{
   label?: string
@@ -21,18 +22,22 @@ const describedBy = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col gap-1">
+  <div class="flex flex-col gap-1.5">
     <label
       v-if="label || $slots.label"
       :for="controlId"
-      class="text-subtitle2 text-neutral"
     >
-      <slot name="label">{{ label }}</slot>
-      <span
-        v-if="required"
-        class="text-danger"
-        aria-hidden="true"
-      >&nbsp;*</span>
+      <Text
+        as="span"
+        variant="body-medium"
+        :class="invalid ? 'text-danger' : 'text-neutral'"
+      >
+        <slot name="label">{{ label }}</slot>
+        <span
+          v-if="required"
+          aria-hidden="true"
+        >&nbsp;*</span>
+      </Text>
     </label>
 
     <slot
@@ -41,20 +46,22 @@ const describedBy = computed(() =>
       :invalid="invalid"
     />
 
-    <p
+    <Text
       v-if="invalid"
       :id="describedById"
-      class="text-danger text-sm"
+      variant="body-xs"
+      color="danger"
       role="alert"
     >
       {{ error }}
-    </p>
-    <p
+    </Text>
+    <Text
       v-else-if="helpText"
       :id="describedById"
-      class="text-neutral-muted text-sm"
+      variant="body-xs"
+      color="muted"
     >
       {{ helpText }}
-    </p>
+    </Text>
   </div>
 </template>

@@ -24,20 +24,19 @@ const model = defineModel<string>({ default: '' })
     :error="error"
   >
     <template #default="{ controlId, describedBy, invalid }">
-      <q-input
+      <input
         :id="controlId"
         v-model="model"
         :type="type ?? 'text'"
         :placeholder="placeholder"
-        :disable="disabled"
-        :error="invalid"
+        :disabled="disabled"
         :aria-describedby="describedBy"
-        outlined
-        dense
-        hide-bottom-space
+        :aria-invalid="invalid"
+        class="bg-surface-l0 text-neutral placeholder:text-neutral-quiet w-full appearance-none rounded-md border border-solid px-3 py-2.5 text-[16px] outline-none transition-colors focus:border-[color:var(--bg-brand-emphasis-rest)] disabled:opacity-60"
+        :class="invalid ? 'border-[color:var(--border-danger-emphasis)]' : 'border-[color:var(--border-neutral-muted)]'"
         @blur="emit('blur')"
         @focus="emit('focus')"
-      />
+      >
     </template>
   </FieldShell>
 </template>
