@@ -31,12 +31,19 @@ export interface ValidationResult {
   jumpTo: number | null
 }
 
+export interface ErrorListItem {
+  step: number
+  message: string
+}
+
 export interface UseValidation {
   validateAll: () => ValidationResult
   /** Field name → error messages from the last submit (reactive). */
   fieldErrors: ComputedRef<Record<string, string[]>>
   /** First error message for a field, or undefined. */
   errorFor: (field: string) => string | undefined
+  /** Flat list of errors (with owning step) for the review summary banner. */
+  errorList: ComputedRef<ErrorListItem[]>
 }
 
 /** Unified, submit-time validation aggregating zod and time conflicts. */
@@ -93,5 +100,13 @@ export function useValidation(): UseValidation {
     return fieldErrors.value[field]?.[0]
   }
 
-  return { validateAll, fieldErrors, errorFor }
+  const errorList = computed<ErrorListItem[]>(() => {
+    const items: ErrorListItem[] = []
+    for (const [field, messages] of Object.entries(fieldErrors.value)) {
+      for (const message of messages) items.push({ step: FIELD_STEP[field] ?? 4, message })
+    }
+    return items.sort((a, b) => a.step - b.step)
+  })
+
+  return { validateAll, fieldErrors, errorFor, errorList }
 }

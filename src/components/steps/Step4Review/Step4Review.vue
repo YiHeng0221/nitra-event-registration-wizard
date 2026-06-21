@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRegistration } from 'src/composables/useRegistration'
 import { usePricing } from 'src/composables/usePricing'
+import { useValidation } from 'src/composables/useValidation'
 import { loadTicketTypes } from 'src/data/tickets'
 import { loadSessions } from 'src/data/sessions'
 import { loadAddons } from 'src/data/addons'
@@ -9,9 +10,11 @@ import { formatDateTime } from 'src/utils/datetime'
 import type { Session } from 'src/types/session'
 import Paper from 'src/components/Paper/Paper.vue'
 import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
+import ErrorBanner from 'src/components/ErrorBanner/ErrorBanner.vue'
 
 const { state } = useRegistration()
 const { formatCurrency } = usePricing()
+const { errorList } = useValidation()
 const tickets = loadTicketTypes()
 const sessionById = new Map(loadSessions().map((session) => [session.id, session]))
 const addonById = new Map(loadAddons().map((addon) => [addon.id, addon]))
@@ -69,6 +72,11 @@ function editStep(step: number): void {
     <h2 class="text-h6 text-neutral font-bold">
       Review Your Registration
     </h2>
+
+    <ErrorBanner
+      v-if="errorList.length > 0"
+      :items="errorList"
+    />
 
     <Paper :level="1">
       <div class="mb-3 flex items-center justify-between">

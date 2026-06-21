@@ -45,10 +45,9 @@ function goBack(): void {
 function submit(): void {
   const result = validateAll()
   lastValidation.value = result
-  if (!result.valid && result.jumpTo !== null) {
-    state.currentStep = result.jumpTo
-    return
-  }
+  // Stay on Review on failure — the error banner + per-step badges + field hints
+  // surface what's missing (no auto-jump).
+  if (!result.valid) return
   emit('submit')
 }
 </script>
