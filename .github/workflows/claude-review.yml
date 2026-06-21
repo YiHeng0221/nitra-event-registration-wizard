@@ -2,6 +2,12 @@ name: claude-review
 
 # Auto-review every pull request with Claude Code, using the project's
 # code-review skill (.claude/skills/code-review/SKILL.md) as the rubric.
+#
+# Design: posting is deterministic, not left to the model. A workflow step
+# captures the diff; the action only READS it and WRITES a markdown review to
+# a file; a final step ALWAYS posts that file as a PR comment (with a fallback
+# note if the file is missing/empty). This fixes the old failure where the
+# check passed but nothing visible was ever posted.
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -29,28 +35,73 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Claude review
+      # Deterministic: capture the diff + changed files for Claude to read.
+      - name: Collect PR diff
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr diff ${{ github.event.pull_request.number }} > pr.diff
+          gh pr view ${{ github.event.pull_request.number }} \
+            --json files --jq '.files[].path' > pr-files.txt
+          echo "Diff lines: $(wc -l < pr.diff)"
+
+      # Claude only reasons + writes the review to review-output.md (no posting).
+      - name: Generate review
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          # Use the workflow's built-in token so the Claude GitHub App is not required.
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Load the project's skill so review follows our three-lens rubric.
-          claude_args: "--model sonnet --setting-sources project"
+          claude_args: >-
+            --model sonnet
+            --setting-sources project
+            --allowedTools "Read,Grep,Glob,Write(review-output.md)"
           prompt: |
-            Review this pull request using the project's code-review skill at
-            .claude/skills/code-review/SKILL.md.
+            Review this pull request and WRITE your review to the file
+            `review-output.md` in the repo root using the Write tool. Do NOT
+            modify any other file and do NOT try to post anything yourself —
+            a later workflow step posts the file for you.
 
-            Apply the three lenses in order — (1) correctness & business logic,
-            (2) Vue patterns & design fidelity, (3) architecture & quality —
-            and honour this repo's rules in CLAUDE.md and the ADRs in doc/.
+            Inputs already in the workspace:
+            - `pr.diff` — the full unified diff (read it).
+            - `pr-files.txt` — the changed file paths.
+            - `.claude/skills/code-review/SKILL.md` — the review rubric (read it).
 
-            Pay special attention to the graded business rules: prices read from
-            src/mocks/event.js, VIP 10% discount on workshops only, conditional
-            shipping-address-required-when-merch, capacity/overlap availability,
-            and deferred submit-time validation (never gate navigation).
+            Review through three lenses, in order: (1) correctness & business
+            logic, (2) Vue patterns & design fidelity, (3) architecture & quality.
+            Honour CLAUDE.md and the ADRs in doc/. Weight the graded business
+            rules: prices read from src/mocks/event.js; VIP 10% discount on
+            workshops only; shipping address required only when merchandise is
+            selected; capacity/overlap availability; validation deferred to
+            submit (never gate navigation).
 
-            Post findings as inline PR review comments, each tagged 🔴 / 🟡 / 🟣
-            with file:line and a one-line reason. Cap nits at 5. End with the
-            review-summary table and a `VERDICT: pass | changes-requested` line.
-            Do not modify code — review only.
+            `review-output.md` must contain, as GitHub-flavoured markdown:
+            1. A one-paragraph summary.
+            2. Itemised findings — one bullet each, line-referenced:
+                 - `path:line` 🔴 blocker | 🟡 should-fix | 🟣 nit — one-line reason
+               Cap nits at 5. If there are no findings, say so explicitly.
+            3. A final line: `VERDICT: pass` or `VERDICT: changes-requested`
+               (changes-requested only if there is a 🔴 blocker).
+
+      # Deterministic: ALWAYS post the review (or a clear fallback note).
+      # Sticky: edit this run's prior review comment instead of stacking a new
+      # one on every push; create it the first time.
+      - name: Post review comment
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          {
+            echo "## 🤖 Claude code review"
+            echo
+            if [ -f review-output.md ] && grep -q '[^[:space:]]' review-output.md; then
+              cat review-output.md
+            else
+              echo "⚠️ No review was produced — the \`Generate review\` step"
+              echo "errored or timed out (commonly an expired"
+              echo "\`CLAUDE_CODE_OAUTH_TOKEN\`). See that step's logs."
+            fi
+            echo
+            echo "_Automated — posted by the claude-review workflow (updated in place)._"
+          } > review-body.md
+          gh pr comment ${{ github.event.pull_request.number }} --body-file review-body.md --edit-last \
+            || gh pr comment ${{ github.event.pull_request.number }} --body-file review-body.md
