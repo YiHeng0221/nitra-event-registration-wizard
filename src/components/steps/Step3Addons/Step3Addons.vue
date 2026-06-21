@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useConflicts } from 'src/composables/useConflicts'
-import { usePricing } from 'src/composables/usePricing'
 import { loadAddons } from 'src/data/addons'
 import { formatTimeRange } from 'src/utils/datetime'
 import type { WorkshopAddon, MealAddon, MerchandiseAddon } from 'src/types/addon'
@@ -14,7 +13,6 @@ import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
 
 const { state } = useRegistration()
 const { unavailableWorkshopIds } = useConflicts()
-const { formatCurrency } = usePricing()
 
 const addons = loadAddons()
 const workshops = addons.filter((a): a is WorkshopAddon => a.category === 'workshop')
@@ -125,7 +123,7 @@ function sizeOptions(item: MerchandiseAddon): Array<{ label: string; value: stri
             <h3 class="text-subtitle1 text-neutral font-semibold">
               {{ workshop.name }}
             </h3>
-            <span class="text-subtitle1 text-neutral font-bold">{{ formatCurrency(workshop.price) }}</span>
+            <span class="text-subtitle1 text-neutral font-bold">${{ workshop.price }}</span>
           </div>
           <p class="text-neutral-muted mt-1 text-sm">
             {{ workshop.description }}
@@ -135,7 +133,7 @@ function sizeOptions(item: MerchandiseAddon): Array<{ label: string; value: stri
           </p>
           <p
             class="mt-2 text-xs font-medium"
-            :class="workshopFull(workshop) || unavailableWorkshopIds.has(workshop.id) ? 'text-danger' : 'text-accent-emphasis'"
+            :class="workshopFull(workshop) || unavailableWorkshopIds.has(workshop.id) ? 'text-danger' : 'text-neutral-quiet'"
           >
             <template v-if="workshopFull(workshop)">
               Sold Out
@@ -165,7 +163,7 @@ function sizeOptions(item: MerchandiseAddon): Array<{ label: string; value: stri
             <h3 class="text-subtitle1 text-neutral font-semibold">
               {{ meal.name }}
             </h3>
-            <span class="text-subtitle1 text-neutral font-bold">{{ formatCurrency(meal.price) }}</span>
+            <span class="text-subtitle1 text-neutral font-bold">${{ meal.price }}</span>
           </div>
           <p class="text-neutral-muted mt-1 text-sm">
             {{ meal.description }}
@@ -197,7 +195,7 @@ function sizeOptions(item: MerchandiseAddon): Array<{ label: string; value: stri
             <h3 class="text-subtitle1 text-neutral font-semibold">
               {{ item.name }}
             </h3>
-            <span class="text-subtitle1 text-neutral font-bold">{{ formatCurrency(item.price) }}</span>
+            <span class="text-subtitle1 text-neutral font-bold">${{ item.price }}</span>
           </div>
           <p class="text-neutral-muted mt-1 text-sm">
             {{ item.description }}

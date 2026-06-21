@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { useRegistration } from 'src/composables/useRegistration'
-import { usePricing } from 'src/composables/usePricing'
 import { loadTicketTypes } from 'src/data/tickets'
 import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
 import AppInput from 'src/components/AppInput/AppInput.vue'
 
 const { state } = useRegistration()
-const { formatCurrency } = usePricing()
 const tickets = loadTicketTypes()
 </script>
 
@@ -25,7 +23,7 @@ const tickets = loadTicketTypes()
         >
           <div class="flex items-start justify-between">
             <span class="text-subtitle1 text-neutral font-semibold">{{ ticket.name }}</span>
-            <span class="text-subtitle1 text-neutral font-bold">{{ formatCurrency(ticket.price) }}</span>
+            <span class="text-subtitle1 text-neutral font-bold">${{ ticket.price }}</span>
           </div>
           <p class="text-neutral-muted mt-1 text-sm">
             {{ ticket.description }}
@@ -39,14 +37,14 @@ const tickets = loadTicketTypes()
               <q-icon
                 name="check_circle"
                 size="16px"
-                class="text-success"
+                class="text-neutral"
               />
               {{ perk }}
             </li>
           </ul>
           <span
             v-if="state.ticketId === ticket.id"
-            class="bg-success-muted-rest text-success-emphasis mt-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
+            class="bg-success-bold-rest text-inverse mt-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium"
           >
             <q-icon
               name="check"

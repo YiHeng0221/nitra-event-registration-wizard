@@ -7,6 +7,8 @@ const props = defineProps<{
   disabled?: boolean
   /** Sold out — rendered non-selectable and dimmed (often paired with a FULL chip). */
   full?: boolean
+  /** Low-key selected state (tint only, no emphasis border) — used by session cards. */
+  subtle?: boolean
 }>()
 
 const emit = defineEmits<{ select: [] }>()
@@ -27,7 +29,7 @@ function onKeydown(event: KeyboardEvent): void {
 
 <template>
   <Paper
-    :level="0"
+    :level="1"
     bordered
     padding="md"
     role="button"
@@ -36,10 +38,9 @@ function onKeydown(event: KeyboardEvent): void {
     :tabindex="selectable ? 0 : -1"
     class="block transition-colors"
     :class="[
-      selected
-        ? 'border-brand-emphasis bg-brand-subtle-rest shadow-[0_0_0_1px_var(--border-brand-emphasis)]'
-        : '',
-      selectable ? 'cursor-pointer hover:bg-surface-l1' : 'cursor-not-allowed opacity-60',
+      selected && subtle ? 'bg-brand-subtle-rest' : '',
+      selected && !subtle ? 'border-brand-emphasis bg-brand-subtle-rest' : '',
+      selectable ? 'cursor-pointer hover:bg-surface-l2' : 'cursor-not-allowed opacity-60',
     ]"
     @click="activate"
     @keydown="onKeydown"

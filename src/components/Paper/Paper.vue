@@ -28,7 +28,7 @@ const elevationClass = computed(() => {
 
 <template>
   <div
-    class="rounded-lg"
+    class="rounded-md"
     :class="[
       SURFACE[level],
       PADDING[padding],

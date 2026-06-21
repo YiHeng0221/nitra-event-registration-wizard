@@ -73,7 +73,7 @@ function fillPercent(session: Session): number {
       </button>
     </div>
 
-    <p class="text-neutral-muted text-sm">
+    <p class="text-brand text-sm font-medium">
       {{ state.selectedSessionIds.length }} session(s) selected
     </p>
 
@@ -81,6 +81,7 @@ function fillPercent(session: Session): number {
       <SelectableCard
         v-for="session in visibleSessions"
         :key="session.id"
+        subtle
         :selected="isSelected(session.id)"
         :full="fullSessionIds.has(session.id)"
         @select="toggle(session)"
@@ -95,7 +96,7 @@ function fillPercent(session: Session): number {
           <q-icon
             :name="isSelected(session.id) ? 'check_box' : 'check_box_outline_blank'"
             size="20px"
-            :class="isSelected(session.id) ? 'text-brand' : 'text-neutral-quiet'"
+            :class="isSelected(session.id) ? 'text-[var(--bg-brand-emphasis-rest)]' : 'text-neutral-quiet'"
           />
         </div>
 
