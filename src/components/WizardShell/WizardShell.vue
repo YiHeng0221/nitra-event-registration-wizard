@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRegistration } from 'src/composables/useRegistration'
-import { useValidation, type ValidationResult } from 'src/composables/useValidation'
+import { useValidation } from 'src/composables/useValidation'
 import AppHeader from 'src/components/AppHeader/AppHeader.vue'
 import Stepper, { type StepItem } from 'src/components/Stepper/Stepper.vue'
 import Text from 'src/components/Text/Text.vue'
@@ -23,11 +23,11 @@ const NEXT_LABEL: Record<number, string> = {
 }
 
 const { state } = useRegistration()
-const { validateAll } = useValidation()
+const { validateAll, stepHasError } = useValidation()
 
-const lastValidation = ref<ValidationResult | null>(null)
+// Reactive: badges clear as soon as the user resolves the error (post-submit).
 const errorSteps = computed(() =>
-  Object.entries(lastValidation.value?.stepHasError ?? {})
+  Object.entries(stepHasError.value)
     .filter(([, hasError]) => hasError)
     .map(([step]) => Number(step)),
 )
@@ -45,7 +45,6 @@ function goBack(): void {
 }
 function submit(): void {
   const result = validateAll()
-  lastValidation.value = result
   // Stay on Review on failure — the error banner + per-step badges + field hints
   // surface what's missing (no auto-jump).
   if (!result.valid) return

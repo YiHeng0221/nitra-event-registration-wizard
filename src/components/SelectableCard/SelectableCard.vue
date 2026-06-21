@@ -12,6 +12,8 @@ const props = withDefaults(
     level?: 0 | 1 | 2 | 3
     /** Inner content gap in 4px units (default 2 → 8px; tickets use 3 → 12px). */
     gap?: number
+    /** Validation error — red border overriding the normal/selected border. */
+    error?: boolean
   }>(),
   { level: 1, gap: 2 },
 )
@@ -29,6 +31,11 @@ const SURFACE = {
 
 const cardClass = computed(() => {
   // `border-[color:var(...)]` forces colour interpretation so border-width sticks.
+  if (props.error) {
+    // A conflicting selection: red border, keep the selected/surface background.
+    const bg = props.selected ? 'bg-brand-subtle-rest' : SURFACE[props.level]
+    return `${bg} border-2 border-solid border-[color:var(--border-danger-emphasis)]`
+  }
   if (props.selected) {
     return 'bg-brand-subtle-rest border-2 border-solid border-[color:var(--border-brand-emphasis)]'
   }

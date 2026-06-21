@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useConflicts } from 'src/composables/useConflicts'
+import { useValidation } from 'src/composables/useValidation'
 import { loadSessions, groupSessionsByDate } from 'src/data/sessions'
 import { formatTimeRange, formatDayLabel } from 'src/utils/datetime'
 import type { Session, SessionTrack } from 'src/types/session'
@@ -10,6 +11,7 @@ import Text from 'src/components/Text/Text.vue'
 
 const { state } = useRegistration()
 const { fullSessionIds } = useConflicts()
+const { sessionConflictIds } = useValidation()
 
 const sessionsByDay = groupSessionsByDate(loadSessions())
 const days = Object.keys(sessionsByDay)
@@ -30,6 +32,10 @@ function isSelected(id: string): boolean {
 }
 function isFull(session: Session): boolean {
   return fullSessionIds.value.has(session.id)
+}
+/** A selected session overlapping another, surfaced after a submit attempt. */
+function isConflicting(session: Session): boolean {
+  return sessionConflictIds.value.has(session.id)
 }
 function toggle(session: Session): void {
   if (isFull(session)) return
@@ -108,6 +114,7 @@ function spotsClass(session: Session): string {
         :level="0"
         :selected="isSelected(session.id)"
         :full="isFull(session)"
+        :error="isConflicting(session)"
         @select="toggle(session)"
       >
         <div class="flex items-center justify-between gap-2">
@@ -158,6 +165,19 @@ function spotsClass(session: Session): string {
           :class="spotsClass(session)"
         >
           {{ isFull(session) ? 'Sold Out' : `${spotsLeft(session)} spots left` }}
+        </Text>
+
+        <Text
+          v-if="isConflicting(session)"
+          variant="body-xs"
+          color="danger"
+          class="flex items-center gap-1"
+        >
+          <q-icon
+            name="error_outline"
+            size="14px"
+          />
+          Time conflict with another selected session
         </Text>
       </SelectableCard>
     </div>
