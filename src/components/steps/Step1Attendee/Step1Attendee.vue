@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useValidation } from 'src/composables/useValidation'
 import { loadTicketTypes } from 'src/data/tickets'
@@ -7,6 +8,7 @@ import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
 import AppInput from 'src/components/AppInput/AppInput.vue'
 import Text from 'src/components/Text/Text.vue'
 
+const { t } = useI18n()
 const { state } = useRegistration()
 const { errorFor } = useValidation()
 const tickets = loadTicketTypes()
@@ -24,7 +26,7 @@ const merchSelected = computed(() => Object.keys(state.merchandise).length > 0)
         color="neutral"
         class="mb-3"
       >
-        Select Ticket Type
+        {{ t('step1.selectTicket') }}
       </Text>
       <Text
         v-if="errorFor('ticketId')"
@@ -94,7 +96,7 @@ const merchSelected = computed(() => Object.keys(state.merchandise).length > 0)
               variant="body-xs-medium"
               color="inverse"
               as="span"
-            >Selected</Text>
+            >{{ t('step1.selected') }}</Text>
           </span>
         </SelectableCard>
       </div>
@@ -107,49 +109,49 @@ const merchSelected = computed(() => Object.keys(state.merchandise).length > 0)
         color="neutral"
         class="mb-4"
       >
-        Attendee Information
+        {{ t('step1.attendeeInfo') }}
       </Text>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <AppInput
           v-model="state.attendee.fullName"
-          label="Full Name"
-          placeholder="Enter your full name"
+          :label="t('step1.fullName')"
+          :placeholder="t('step1.fullNamePlaceholder')"
           :error="errorFor('fullName')"
         />
         <AppInput
           v-model="state.attendee.email"
           type="email"
-          label="Email"
-          placeholder="Enter your email address"
+          :label="t('step1.email')"
+          :placeholder="t('step1.emailPlaceholder')"
           :error="errorFor('email')"
         />
         <AppInput
           v-model="state.attendee.phone"
           type="tel"
-          label="Phone"
-          placeholder="Enter your phone number"
+          :label="t('step1.phone')"
+          :placeholder="t('step1.phonePlaceholder')"
           :error="errorFor('phone')"
         />
         <AppInput
           v-model="state.attendee.company"
-          label="Company"
-          placeholder="Enter your company name"
+          :label="t('step1.company')"
+          :placeholder="t('step1.companyPlaceholder')"
           :error="errorFor('company')"
         />
       </div>
       <div class="mt-4 flex flex-col gap-4">
         <AppInput
           v-model="state.attendee.jobTitle"
-          label="Job Title"
-          placeholder="Enter your job title"
+          :label="t('step1.jobTitle')"
+          :placeholder="t('step1.jobTitlePlaceholder')"
           :error="errorFor('jobTitle')"
         />
         <AppInput
           v-model="state.attendee.shippingAddress"
-          :label="merchSelected ? 'Shipping Address' : 'Shipping Address (Optional)'"
+          :label="merchSelected ? t('step1.shipping') : t('step1.shippingOptional')"
           :required="merchSelected"
-          placeholder="Enter your shipping address"
-          :help-text="merchSelected ? '(required for merchandise)' : ''"
+          :placeholder="t('step1.shippingPlaceholder')"
+          :help-text="merchSelected ? t('step1.shippingHint') : ''"
           :error="errorFor('shippingAddress')"
         />
       </div>

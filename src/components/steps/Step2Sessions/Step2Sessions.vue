@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useConflicts } from 'src/composables/useConflicts'
 import { useValidation } from 'src/composables/useValidation'
@@ -9,6 +10,7 @@ import type { Session, SessionTrack } from 'src/types/session'
 import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
 import Text from 'src/components/Text/Text.vue'
 
+const { t } = useI18n()
 const { state } = useRegistration()
 const { fullSessionIds } = useConflicts()
 const { sessionConflictIds } = useValidation()
@@ -74,7 +76,7 @@ function spotsClass(session: Session): string {
       variant="h4"
       color="neutral"
     >
-      Select Sessions
+      {{ t('step2.title') }}
     </Text>
 
     <div
@@ -104,7 +106,7 @@ function spotsClass(session: Session): string {
       variant="body-medium"
       color="brand"
     >
-      {{ state.selectedSessionIds.length }} session(s) selected
+      {{ t('step2.selectedCount', { count: state.selectedSessionIds.length }) }}
     </Text>
 
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -164,7 +166,7 @@ function spotsClass(session: Session): string {
           variant="body-xs-medium"
           :class="spotsClass(session)"
         >
-          {{ isFull(session) ? 'Sold Out' : `${spotsLeft(session)} spots left` }}
+          {{ isFull(session) ? t('step2.soldOut') : t('step2.spotsLeft', { count: spotsLeft(session) }) }}
         </Text>
 
         <Text
@@ -177,7 +179,7 @@ function spotsClass(session: Session): string {
             name="error_outline"
             size="14px"
           />
-          Time conflict with another selected session
+          {{ t('step2.conflict') }}
         </Text>
       </SelectableCard>
     </div>

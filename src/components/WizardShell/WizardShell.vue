@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useValidation } from 'src/composables/useValidation'
 import AppHeader from 'src/components/AppHeader/AppHeader.vue'
@@ -8,19 +9,21 @@ import Text from 'src/components/Text/Text.vue'
 
 const emit = defineEmits<{ submit: [] }>()
 
-const STEPS: StepItem[] = [
-  { n: 1, label: 'Attendee Info' },
-  { n: 2, label: 'Sessions' },
-  { n: 3, label: 'Add-ons' },
-  { n: 4, label: 'Review' },
-]
+const { t } = useI18n()
+
+const STEPS = computed<StepItem[]>(() => [
+  { n: 1, label: t('stepper.attendee') },
+  { n: 2, label: t('stepper.sessions') },
+  { n: 3, label: t('stepper.addons') },
+  { n: 4, label: t('stepper.review') },
+])
 
 /** Contextual label for the primary action, by current step. */
-const NEXT_LABEL: Record<number, string> = {
-  1: 'Next: Session Selection',
-  2: 'Next: Add-ons',
-  3: 'Next: Review',
-}
+const NEXT_LABEL = computed<Record<number, string>>(() => ({
+  1: t('nav.nextSessions'),
+  2: t('nav.nextAddons'),
+  3: t('nav.nextReview'),
+}))
 
 const { state } = useRegistration()
 const { validateAll, stepHasError } = useValidation()
@@ -32,13 +35,13 @@ const errorSteps = computed(() =>
     .map(([step]) => Number(step)),
 )
 
-const isLastStep = computed(() => state.currentStep >= STEPS.length)
+const isLastStep = computed(() => state.currentStep >= STEPS.value.length)
 
 function goTo(step: number): void {
   state.currentStep = step
 }
 function goNext(): void {
-  if (state.currentStep < STEPS.length) state.currentStep += 1
+  if (state.currentStep < STEPS.value.length) state.currentStep += 1
 }
 function goBack(): void {
   if (state.currentStep > 1) state.currentStep -= 1
@@ -109,7 +112,7 @@ function submit(): void {
           variant="subtitle2"
           color="neutral"
         >
-          Back
+          {{ t('common.back') }}
         </Text>
       </button>
       <span v-else />
@@ -124,7 +127,7 @@ function submit(): void {
           variant="subtitle2"
           color="inverse"
         >
-          {{ isLastStep ? 'Submit Registration' : NEXT_LABEL[state.currentStep] }}
+          {{ isLastStep ? t('nav.submit') : NEXT_LABEL[state.currentStep] }}
         </Text>
       </button>
     </div>

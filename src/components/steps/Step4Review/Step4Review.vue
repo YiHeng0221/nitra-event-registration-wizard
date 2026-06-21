@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { usePricing } from 'src/composables/usePricing'
 import { useValidation } from 'src/composables/useValidation'
@@ -14,6 +15,7 @@ import ErrorBanner from 'src/components/ErrorBanner/ErrorBanner.vue'
 import Text from 'src/components/Text/Text.vue'
 import VStack from 'src/components/Stack/VStack.vue'
 
+const { t } = useI18n()
 const { state } = useRegistration()
 const { formatCurrency } = usePricing()
 const { errorList } = useValidation()
@@ -34,21 +36,21 @@ interface AttendeeRow {
   missingText?: string
 }
 const attendeeRows = computed<AttendeeRow[]>(() => [
-  { label: 'Name', value: state.attendee.fullName, required: true },
-  { label: 'Email', value: state.attendee.email, required: true },
-  { label: 'Phone', value: state.attendee.phone, required: true },
-  { label: 'Company', value: state.attendee.company, required: true },
-  { label: 'Job Title', value: state.attendee.jobTitle, required: true },
+  { label: t('step4.name'), value: state.attendee.fullName, required: true },
+  { label: t('step4.email'), value: state.attendee.email, required: true },
+  { label: t('step4.phone'), value: state.attendee.phone, required: true },
+  { label: t('step4.company'), value: state.attendee.company, required: true },
+  { label: t('step4.jobTitle'), value: state.attendee.jobTitle, required: true },
   {
-    label: 'Ticket Type',
+    label: t('step4.ticketType'),
     value: ticket.value ? `${ticket.value.name} (${formatCurrency(ticket.value.price)})` : '',
     required: true,
   },
   {
-    label: 'Shipping Address',
+    label: t('step4.shipping'),
     value: state.attendee.shippingAddress,
     required: merchSelected.value,
-    missingText: '— (required for merchandise)',
+    missingText: t('step4.requiredMerch'),
   },
 ])
 
@@ -66,16 +68,16 @@ const addonRows = computed<AddonRow[]>(() => {
   const rows: AddonRow[] = []
   for (const id of state.selectedWorkshopIds) {
     const addon = addonById.get(id)
-    if (addon) rows.push({ type: 'Workshop', label: `${addon.name} (${formatCurrency(addon.price)})` })
+    if (addon) rows.push({ type: t('step4.workshop'), label: `${addon.name} (${formatCurrency(addon.price)})` })
   }
   for (const id of state.selectedMealIds) {
     const addon = addonById.get(id)
-    if (addon) rows.push({ type: 'Meal', label: `${addon.name} (${formatCurrency(addon.price)})` })
+    if (addon) rows.push({ type: t('step4.meal'), label: `${addon.name} (${formatCurrency(addon.price)})` })
   }
   for (const [id, selection] of Object.entries(state.merchandise)) {
     const addon = addonById.get(id)
     if (addon) {
-      rows.push({ type: 'Merchandise', label: `${addon.name} × ${selection.quantity}` })
+      rows.push({ type: t('step4.merchandise'), label: `${addon.name} × ${selection.quantity}` })
     }
   }
   return rows
@@ -100,7 +102,7 @@ function sectionErrorClass(step: number): string {
       variant="h4"
       color="neutral"
     >
-      Review Your Registration
+      {{ t('step4.title') }}
     </Text>
 
     <ErrorBanner
@@ -118,14 +120,14 @@ function sectionErrorClass(step: number): string {
           variant="subtitle1"
           color="neutral"
         >
-          Attendee Information
+          {{ t('step4.attendeeInfo') }}
         </Text>
         <button
           type="button"
           class="text-brand cursor-pointer border-0 bg-transparent underline-offset-2 hover:underline"
           @click="editStep(1)"
         >
-          Edit → Step 1
+          {{ t('step4.editStep', { n: 1 }) }}
         </button>
       </div>
       <dl class="flex flex-col gap-2">
@@ -146,7 +148,7 @@ function sectionErrorClass(step: number): string {
             variant="body"
             :class="row.required && !row.value ? 'text-danger' : 'text-neutral'"
           >
-            {{ row.required && !row.value ? (row.missingText ?? '— (required)') : row.value || '—' }}
+            {{ row.required && !row.value ? (row.missingText ?? t('step4.required')) : row.value || t('common.dash') }}
           </Text>
         </div>
       </dl>
@@ -162,14 +164,14 @@ function sectionErrorClass(step: number): string {
           variant="subtitle1"
           color="neutral"
         >
-          Selected Sessions
+          {{ t('step4.selectedSessions') }}
         </Text>
         <button
           type="button"
           class="text-brand cursor-pointer border-0 bg-transparent underline-offset-2 hover:underline"
           @click="editStep(2)"
         >
-          Edit → Step 2
+          {{ t('step4.editStep', { n: 2 }) }}
         </button>
       </div>
       <VStack :gap="2">
@@ -178,7 +180,7 @@ function sectionErrorClass(step: number): string {
           variant="body"
           color="muted"
         >
-          No sessions selected.
+          {{ t('step4.noSessions') }}
         </Text>
         <div
           v-for="session in selectedSessions"
@@ -215,14 +217,14 @@ function sectionErrorClass(step: number): string {
           variant="subtitle1"
           color="neutral"
         >
-          Add-ons
+          {{ t('step4.addons') }}
         </Text>
         <button
           type="button"
           class="text-brand cursor-pointer border-0 bg-transparent underline-offset-2 hover:underline"
           @click="editStep(3)"
         >
-          Edit → Step 3
+          {{ t('step4.editStep', { n: 3 }) }}
         </button>
       </div>
       <VStack :gap="2">
@@ -231,7 +233,7 @@ function sectionErrorClass(step: number): string {
           variant="body"
           color="muted"
         >
-          No add-ons selected.
+          {{ t('step4.noAddons') }}
         </Text>
         <div
           v-for="(row, index) in addonRows"
@@ -258,8 +260,8 @@ function sectionErrorClass(step: number): string {
     </Paper>
 
     <OrderSummary
-      title="Pricing Summary"
-      total-label="Grand Total"
+      :title="t('orderSummary.pricingTitle')"
+      :total-label="t('orderSummary.grandTotal')"
     />
   </div>
 </template>

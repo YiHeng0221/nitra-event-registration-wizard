@@ -1,10 +1,11 @@
 <script setup lang="ts">
-// App header: logo emblem + event name. Left-aligned on desktop, centered on mobile.
+// App header: logo emblem + event name on the left, language switcher on the right.
 import Text from 'src/components/Text/Text.vue'
+import LocaleSwitcher from 'src/components/LocaleSwitcher/LocaleSwitcher.vue'
 </script>
 
 <template>
-  <header class="flex h-[72px] items-center justify-center px-12 md:justify-start">
+  <header class="flex h-[72px] items-center justify-between px-6 md:px-12">
     <div class="flex items-center gap-3">
       <span class="bg-brand-emphasis-rest flex h-10 w-10 items-center justify-center rounded-lg">
         <!-- N emblem (Logo.svg) — white mark on brand-emphasis square -->
@@ -28,5 +29,7 @@ import Text from 'src/components/Text/Text.vue'
         WebDev Summit 2028
       </Text>
     </div>
+
+    <LocaleSwitcher />
   </header>
 </template>

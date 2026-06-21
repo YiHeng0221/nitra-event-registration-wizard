@@ -1,4 +1,5 @@
 import { computed, ref, type ComputedRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { registrationSchema } from 'src/schemas/registration'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useConflicts } from 'src/composables/useConflicts'
@@ -57,6 +58,7 @@ export interface UseValidation {
 export function useValidation(): UseValidation {
   const { state } = useRegistration()
   const { sessionConflicts } = useConflicts()
+  const { t } = useI18n()
 
   /** Pure derivation of the full error state from the current store + conflicts. */
   function compute(): ValidationResult {
@@ -75,12 +77,9 @@ export function useValidation(): UseValidation {
     }
 
     // Session↔session conflicts are deferred to submit (not a live block).
-    const conflicts = sessionConflicts.value
-    if (conflicts.length > 0) {
-      addError(
-        'selectedSessionIds',
-        `You have ${conflicts.length} overlapping session selection(s) to resolve`,
-      )
+    // Store the i18n key; it's translated at the display exits below.
+    if (sessionConflicts.value.length > 0) {
+      addError('selectedSessionIds', 'validation.sessionConflicts')
     }
 
     const stepHasError: Record<number, boolean> = {}
@@ -116,15 +115,17 @@ export function useValidation(): UseValidation {
     hasAttemptedSubmit.value ? compute() : null,
   )
 
+  // `errors` holds i18n keys; translate to the active locale at the exits.
   const fieldErrors = computed(() => liveResult.value?.errors ?? {})
   function errorFor(field: string): string | undefined {
-    return fieldErrors.value[field]?.[0]
+    const key = fieldErrors.value[field]?.[0]
+    return key === undefined ? undefined : t(key)
   }
 
   const errorList = computed<ErrorListItem[]>(() => {
     const items: ErrorListItem[] = []
     for (const [field, messages] of Object.entries(fieldErrors.value)) {
-      for (const message of messages) items.push({ step: FIELD_STEP[field] ?? 4, message })
+      for (const message of messages) items.push({ step: FIELD_STEP[field] ?? 4, message: t(message) })
     }
     return items.sort((a, b) => a.step - b.step)
   })

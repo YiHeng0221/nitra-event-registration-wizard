@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Text from 'src/components/Text/Text.vue'
 
 export interface StepItem {
@@ -15,6 +16,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{ navigate: [step: number] }>()
+
+const { t } = useI18n()
 
 type Status = 'done' | 'current' | 'error' | 'future'
 
@@ -103,7 +106,7 @@ const LABEL_CLASS: Record<Status, string> = {
       align="center"
       class="mt-2 md:hidden"
     >
-      Step {{ current }} of {{ steps.length }} — {{ currentLabel }}
+      {{ t('stepper.progress', { current, total: steps.length, label: currentLabel }) }}
     </Text>
   </div>
 </template>

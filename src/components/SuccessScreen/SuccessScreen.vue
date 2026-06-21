@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { loadTicketTypes } from 'src/data/tickets'
 import AppHeader from 'src/components/AppHeader/AppHeader.vue'
@@ -7,9 +8,12 @@ import Text from 'src/components/Text/Text.vue'
 
 const emit = defineEmits<{ home: [] }>()
 
+const { t } = useI18n()
 const { state } = useRegistration()
 const tickets = loadTicketTypes()
-const ticketName = computed(() => tickets.find((t) => t.id === state.ticketId)?.name ?? 'General')
+const ticketName = computed(
+  () => tickets.find((ticket) => ticket.id === state.ticketId)?.name ?? 'General',
+)
 
 // A demo confirmation reference, generated once per mount.
 const confirmation = `#WDS2028-${String(Math.floor(Math.random() * 90000) + 10000)}`
@@ -34,14 +38,14 @@ const confirmation = `#WDS2028-${String(Math.floor(Math.random() * 90000) + 1000
         variant="h2"
         color="success"
       >
-        Registration Complete!
+        {{ t('success.title') }}
       </Text>
 
       <Text
         variant="body-lg"
         color="neutral"
       >
-        Confirmation {{ confirmation }}
+        {{ t('success.confirmation', { ref: confirmation }) }}
       </Text>
 
       <div>
@@ -49,15 +53,13 @@ const confirmation = `#WDS2028-${String(Math.floor(Math.random() * 90000) + 1000
           variant="body"
           color="muted"
         >
-          Thank you, {{ state.attendee.fullName || 'there' }}! Your {{ ticketName }} registration for
-          WebDev Summit 2028 is confirmed.
+          {{ t('success.thanks', { name: state.attendee.fullName || t('success.thanksName'), ticket: ticketName }) }}
         </Text>
         <Text
           variant="body"
           color="muted"
         >
-          You will receive a confirmation email at
-          {{ state.attendee.email || 'your email address' }}.
+          {{ t('success.emailLine', { email: state.attendee.email || t('success.emailFallback') }) }}
         </Text>
       </div>
 
@@ -71,7 +73,7 @@ const confirmation = `#WDS2028-${String(Math.floor(Math.random() * 90000) + 1000
           variant="subtitle2"
           color="inverse"
         >
-          Back to Home
+          {{ t('success.backHome') }}
         </Text>
       </button>
     </div>
