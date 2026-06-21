@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { usePricing } from 'src/composables/usePricing'
+import { useLocale } from 'src/composables/useLocale'
 import { loadTicketTypes } from 'src/data/tickets'
 import { loadAddons } from 'src/data/addons'
 import Paper from 'src/components/Paper/Paper.vue'
@@ -16,6 +17,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
+const { ticketName, addonName } = useLocale()
 const { state } = useRegistration()
 const { discount, total, formatCurrency } = usePricing()
 const tickets = loadTicketTypes()
@@ -32,17 +34,17 @@ interface SummaryLine {
 const lines = computed<SummaryLine[]>(() => {
   const out: SummaryLine[] = []
   const ticket = tickets.find((entry) => entry.id === state.ticketId)
-  if (ticket) out.push({ label: t('orderSummary.ticket', { name: ticket.name }), amount: ticket.price })
+  if (ticket) out.push({ label: t('orderSummary.ticket', { name: ticketName(ticket.id) }), amount: ticket.price })
 
   for (const id of [...state.selectedWorkshopIds, ...state.selectedMealIds]) {
     const addon = addonById.get(id)
-    if (addon) out.push({ label: addon.name, amount: addon.price })
+    if (addon) out.push({ label: addonName(addon.id), amount: addon.price })
   }
   for (const [id, selection] of Object.entries(state.merchandise)) {
     const addon = addonById.get(id)
     if (addon) {
       out.push({
-        label: t('orderSummary.qtyLine', { name: addon.name, qty: selection.quantity }),
+        label: t('orderSummary.qtyLine', { name: addonName(addon.id), qty: selection.quantity }),
         amount: addon.price * selection.quantity,
       })
     }

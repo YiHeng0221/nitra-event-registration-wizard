@@ -3,12 +3,14 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useValidation } from 'src/composables/useValidation'
+import { useLocale } from 'src/composables/useLocale'
 import { loadTicketTypes } from 'src/data/tickets'
 import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
 import AppInput from 'src/components/AppInput/AppInput.vue'
 import Text from 'src/components/Text/Text.vue'
 
 const { t } = useI18n()
+const { ticketName, ticketDesc, perkLabel } = useLocale()
 const { state } = useRegistration()
 const { errorFor } = useValidation()
 const tickets = loadTicketTypes()
@@ -51,7 +53,7 @@ const merchSelected = computed(() => Object.keys(state.merchandise).length > 0)
               color="neutral"
               as="span"
             >
-              {{ ticket.name }}
+              {{ ticketName(ticket.id) }}
             </Text>
             <Text
               variant="subtitle1"
@@ -65,7 +67,7 @@ const merchSelected = computed(() => Object.keys(state.merchandise).length > 0)
             variant="body"
             color="muted"
           >
-            {{ ticket.description }}
+            {{ ticketDesc(ticket.id) }}
           </Text>
           <div class="flex flex-col gap-1.5">
             <Text
@@ -80,7 +82,7 @@ const merchSelected = computed(() => Object.keys(state.merchandise).length > 0)
                 size="16px"
                 class="text-neutral"
               />
-              {{ perk }}
+              {{ perkLabel(perk) }}
             </Text>
           </div>
           <span

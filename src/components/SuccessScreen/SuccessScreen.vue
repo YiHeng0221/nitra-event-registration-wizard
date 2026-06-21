@@ -2,18 +2,16 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
-import { loadTicketTypes } from 'src/data/tickets'
+import { useLocale } from 'src/composables/useLocale'
 import AppHeader from 'src/components/AppHeader/AppHeader.vue'
 import Text from 'src/components/Text/Text.vue'
 
 const emit = defineEmits<{ home: [] }>()
 
 const { t } = useI18n()
+const { ticketName } = useLocale()
 const { state } = useRegistration()
-const tickets = loadTicketTypes()
-const ticketName = computed(
-  () => tickets.find((ticket) => ticket.id === state.ticketId)?.name ?? 'General',
-)
+const ticketLabel = computed(() => (state.ticketId ? ticketName(state.ticketId) : ''))
 
 // A demo confirmation reference, generated once per mount.
 const confirmation = `#WDS2028-${String(Math.floor(Math.random() * 90000) + 10000)}`
@@ -53,7 +51,7 @@ const confirmation = `#WDS2028-${String(Math.floor(Math.random() * 90000) + 1000
           variant="body"
           color="muted"
         >
-          {{ t('success.thanks', { name: state.attendee.fullName || t('success.thanksName'), ticket: ticketName }) }}
+          {{ t('success.thanks', { name: state.attendee.fullName || t('success.thanksName'), ticket: ticketLabel }) }}
         </Text>
         <Text
           variant="body"

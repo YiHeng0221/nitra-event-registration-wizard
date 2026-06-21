@@ -3,8 +3,8 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useConflicts } from 'src/composables/useConflicts'
+import { useLocale } from 'src/composables/useLocale'
 import { loadAddons } from 'src/data/addons'
-import { formatTimeRange } from 'src/utils/datetime'
 import type { WorkshopAddon, MealAddon, MerchandiseAddon } from 'src/types/addon'
 import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
 import NumberStepper from 'src/components/NumberStepper/NumberStepper.vue'
@@ -13,6 +13,7 @@ import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
 import Text from 'src/components/Text/Text.vue'
 
 const { t } = useI18n()
+const { timeRange, addonName, addonDesc } = useLocale()
 const { state } = useRegistration()
 const { unavailableWorkshopIds } = useConflicts()
 
@@ -130,7 +131,7 @@ function setSize(id: string, size: string | number | null): void {
               variant="subtitle1"
               color="neutral"
             >
-              {{ workshop.name }}
+              {{ addonName(workshop.id) }}
             </Text>
             <Text
               as="span"
@@ -144,13 +145,13 @@ function setSize(id: string, size: string | number | null): void {
             variant="body"
             color="muted"
           >
-            {{ workshop.description }}
+            {{ addonDesc(workshop.id) }}
           </Text>
           <Text
             variant="body"
             color="muted"
           >
-            {{ formatTimeRange(workshop.date, workshop.endDate) }}
+            {{ timeRange(workshop.date, workshop.endDate) }}
           </Text>
           <Text
             variant="body-xs-medium"
@@ -187,7 +188,7 @@ function setSize(id: string, size: string | number | null): void {
               variant="subtitle1"
               color="neutral"
             >
-              {{ meal.name }}
+              {{ addonName(meal.id) }}
             </Text>
             <Text
               as="span"
@@ -201,7 +202,7 @@ function setSize(id: string, size: string | number | null): void {
             variant="body"
             color="muted"
           >
-            {{ meal.description }}
+            {{ addonDesc(meal.id) }}
           </Text>
         </SelectableCard>
       </div>
@@ -242,7 +243,7 @@ function setSize(id: string, size: string | number | null): void {
               variant="subtitle1"
               color="neutral"
             >
-              {{ item.name }}
+              {{ addonName(item.id) }}
             </Text>
             <Text
               as="span"
@@ -256,7 +257,7 @@ function setSize(id: string, size: string | number | null): void {
             variant="body"
             color="muted"
           >
-            {{ item.description }}
+            {{ addonDesc(item.id) }}
           </Text>
 
           <div class="flex flex-wrap items-center gap-4">

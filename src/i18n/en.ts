@@ -1,5 +1,8 @@
+import content from 'src/i18n/content.en'
+
 /** English (default) UI strings. Keys mirror the component areas. */
 export default {
+  content,
   common: {
     back: 'Back',
     select: 'Select',

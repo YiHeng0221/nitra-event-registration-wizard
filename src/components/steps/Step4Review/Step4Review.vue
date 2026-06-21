@@ -4,10 +4,10 @@ import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { usePricing } from 'src/composables/usePricing'
 import { useValidation } from 'src/composables/useValidation'
+import { useLocale } from 'src/composables/useLocale'
 import { loadTicketTypes } from 'src/data/tickets'
 import { loadSessions } from 'src/data/sessions'
 import { loadAddons } from 'src/data/addons'
-import { formatDateTime } from 'src/utils/datetime'
 import type { Session } from 'src/types/session'
 import Paper from 'src/components/Paper/Paper.vue'
 import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
@@ -16,6 +16,7 @@ import Text from 'src/components/Text/Text.vue'
 import VStack from 'src/components/Stack/VStack.vue'
 
 const { t } = useI18n()
+const { dateTime, sessionTitle, ticketName, addonName } = useLocale()
 const { state } = useRegistration()
 const { formatCurrency } = usePricing()
 const { errorList } = useValidation()
@@ -43,7 +44,7 @@ const attendeeRows = computed<AttendeeRow[]>(() => [
   { label: t('step4.jobTitle'), value: state.attendee.jobTitle, required: true },
   {
     label: t('step4.ticketType'),
-    value: ticket.value ? `${ticket.value.name} (${formatCurrency(ticket.value.price)})` : '',
+    value: ticket.value ? `${ticketName(ticket.value.id)} (${formatCurrency(ticket.value.price)})` : '',
     required: true,
   },
   {
@@ -68,16 +69,16 @@ const addonRows = computed<AddonRow[]>(() => {
   const rows: AddonRow[] = []
   for (const id of state.selectedWorkshopIds) {
     const addon = addonById.get(id)
-    if (addon) rows.push({ type: t('step4.workshop'), label: `${addon.name} (${formatCurrency(addon.price)})` })
+    if (addon) rows.push({ type: t('step4.workshop'), label: `${addonName(id)} (${formatCurrency(addon.price)})` })
   }
   for (const id of state.selectedMealIds) {
     const addon = addonById.get(id)
-    if (addon) rows.push({ type: t('step4.meal'), label: `${addon.name} (${formatCurrency(addon.price)})` })
+    if (addon) rows.push({ type: t('step4.meal'), label: `${addonName(id)} (${formatCurrency(addon.price)})` })
   }
   for (const [id, selection] of Object.entries(state.merchandise)) {
     const addon = addonById.get(id)
     if (addon) {
-      rows.push({ type: t('step4.merchandise'), label: `${addon.name} × ${selection.quantity}` })
+      rows.push({ type: t('step4.merchandise'), label: `${addonName(id)} × ${selection.quantity}` })
     }
   }
   return rows
@@ -193,7 +194,7 @@ function sectionErrorClass(step: number): string {
             color="muted"
             nowrap
           >
-            {{ formatDateTime(session.date) }}
+            {{ dateTime(session.date) }}
           </Text>
           <Text
             as="span"
@@ -201,7 +202,7 @@ function sectionErrorClass(step: number): string {
             color="neutral"
             class="text-right"
           >
-            {{ session.title }}
+            {{ sessionTitle(session.id) }}
           </Text>
         </div>
       </VStack>

@@ -1,7 +1,9 @@
 import type en from 'src/i18n/en'
+import content from 'src/i18n/content.zh-TW'
 
 /** Traditional Chinese (zh-TW) UI strings. Shape mirrors `en`. */
 const messages: typeof en = {
+  content,
   common: {
     back: '上一步',
     select: '請選擇',
@@ -97,7 +99,7 @@ const messages: typeof en = {
     pricingTitle: '費用摘要',
     total: '總計',
     grandTotal: '總金額',
-    ticket: '{name} 票',
+    ticket: '{name}票',
     qtyLine: '{name} × {qty}',
     workshopDiscount: '工作坊折扣（VIP 9 折）',
   },

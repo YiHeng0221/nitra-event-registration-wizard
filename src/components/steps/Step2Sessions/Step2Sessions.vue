@@ -4,13 +4,14 @@ import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useConflicts } from 'src/composables/useConflicts'
 import { useValidation } from 'src/composables/useValidation'
+import { useLocale } from 'src/composables/useLocale'
 import { loadSessions, groupSessionsByDate } from 'src/data/sessions'
-import { formatTimeRange, formatDayLabel } from 'src/utils/datetime'
 import type { Session, SessionTrack } from 'src/types/session'
 import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
 import Text from 'src/components/Text/Text.vue'
 
 const { t } = useI18n()
+const { timeRange, dayLabel, sessionTitle, sessionSpeakerTitle, trackLabel } = useLocale()
 const { state } = useRegistration()
 const { fullSessionIds } = useConflicts()
 const { sessionConflictIds } = useValidation()
@@ -98,7 +99,7 @@ function spotsClass(session: Session): string {
         "
         @click="activeDay = day"
       >
-        {{ formatDayLabel(day) }}
+        {{ dayLabel(day) }}
       </button>
     </div>
 
@@ -126,7 +127,7 @@ function spotsClass(session: Session): string {
             class="rounded-full px-[6px] py-[3px] uppercase"
             :class="TRACK_CLASS[session.track]"
           >
-            {{ session.track }}
+            {{ trackLabel(session.track) }}
           </Text>
           <q-icon
             :name="isSelected(session.id) ? 'check_box' : 'check_box_outline_blank'"
@@ -140,19 +141,19 @@ function spotsClass(session: Session): string {
           variant="subtitle1"
           color="neutral"
         >
-          {{ session.title }}
+          {{ sessionTitle(session.id) }}
         </Text>
         <Text
           variant="body"
           color="muted"
         >
-          {{ session.speaker }}, {{ session.speakerTitle }}
+          {{ session.speaker }}, {{ sessionSpeakerTitle(session.id) }}
         </Text>
         <Text
           variant="body-xs"
           color="quiet"
         >
-          {{ formatTimeRange(session.date, session.endDate) }}
+          {{ timeRange(session.date, session.endDate) }}
         </Text>
 
         <div class="bg-surface-l2 h-[6px] overflow-hidden rounded-full">
