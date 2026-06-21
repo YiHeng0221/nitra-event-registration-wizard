@@ -23,15 +23,32 @@ const addonById = new Map(loadAddons().map((addon) => [addon.id, addon]))
 
 const ticket = computed(() => tickets.find((entry) => entry.id === state.ticketId) ?? null)
 
-const attendeeRows = computed(() => [
-  { label: 'Name', value: state.attendee.fullName },
-  { label: 'Email', value: state.attendee.email },
-  { label: 'Phone', value: state.attendee.phone },
-  { label: 'Company', value: state.attendee.company },
-  { label: 'Job Title', value: state.attendee.jobTitle },
+// Shipping is required only once merchandise is in the order (mirrors registrationSchema).
+const merchSelected = computed(() => Object.keys(state.merchandise).length > 0)
+
+interface AttendeeRow {
+  label: string
+  value: string
+  required: boolean
+  /** Placeholder shown when required and empty. */
+  missingText?: string
+}
+const attendeeRows = computed<AttendeeRow[]>(() => [
+  { label: 'Name', value: state.attendee.fullName, required: true },
+  { label: 'Email', value: state.attendee.email, required: true },
+  { label: 'Phone', value: state.attendee.phone, required: true },
+  { label: 'Company', value: state.attendee.company, required: true },
+  { label: 'Job Title', value: state.attendee.jobTitle, required: true },
   {
     label: 'Ticket Type',
-    value: ticket.value ? `${ticket.value.name} (${formatCurrency(ticket.value.price)})` : '—',
+    value: ticket.value ? `${ticket.value.name} (${formatCurrency(ticket.value.price)})` : '',
+    required: true,
+  },
+  {
+    label: 'Shipping Address',
+    value: state.attendee.shippingAddress,
+    required: merchSelected.value,
+    missingText: '— (required for merchandise)',
   },
 ])
 
@@ -127,9 +144,9 @@ function sectionErrorClass(step: number): string {
           <Text
             as="dd"
             variant="body"
-            color="neutral"
+            :class="row.required && !row.value ? 'text-danger' : 'text-neutral'"
           >
-            {{ row.value || '—' }}
+            {{ row.required && !row.value ? (row.missingText ?? '— (required)') : row.value || '—' }}
           </Text>
         </div>
       </dl>

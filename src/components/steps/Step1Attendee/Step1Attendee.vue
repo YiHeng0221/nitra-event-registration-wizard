@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useValidation } from 'src/composables/useValidation'
 import { loadTicketTypes } from 'src/data/tickets'
@@ -9,6 +10,9 @@ import Text from 'src/components/Text/Text.vue'
 const { state } = useRegistration()
 const { errorFor } = useValidation()
 const tickets = loadTicketTypes()
+
+// Shipping address is only required once merchandise is in the order.
+const merchSelected = computed(() => Object.keys(state.merchandise).length > 0)
 </script>
 
 <template>
@@ -142,8 +146,10 @@ const tickets = loadTicketTypes()
         />
         <AppInput
           v-model="state.attendee.shippingAddress"
-          label="Shipping Address (Optional)"
+          :label="merchSelected ? 'Shipping Address' : 'Shipping Address (Optional)'"
+          :required="merchSelected"
           placeholder="Enter your shipping address"
+          :help-text="merchSelected ? '(required for merchandise)' : ''"
           :error="errorFor('shippingAddress')"
         />
       </div>
