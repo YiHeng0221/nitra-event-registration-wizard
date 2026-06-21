@@ -21,16 +21,16 @@ const describedBy = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col gap-1">
+  <div class="flex flex-col gap-1.5">
     <label
       v-if="label || $slots.label"
       :for="controlId"
-      class="text-subtitle2 text-neutral"
+      class="text-[12px] font-medium"
+      :class="invalid ? 'text-danger' : 'text-neutral'"
     >
       <slot name="label">{{ label }}</slot>
       <span
         v-if="required"
-        class="text-danger"
         aria-hidden="true"
       >&nbsp;*</span>
     </label>
@@ -44,7 +44,7 @@ const describedBy = computed(() =>
     <p
       v-if="invalid"
       :id="describedById"
-      class="text-danger text-sm"
+      class="text-danger text-[11px]"
       role="alert"
     >
       {{ error }}
@@ -52,7 +52,7 @@ const describedBy = computed(() =>
     <p
       v-else-if="helpText"
       :id="describedById"
-      class="text-neutral-muted text-sm"
+      class="text-neutral-muted text-[11px]"
     >
       {{ helpText }}
     </p>
