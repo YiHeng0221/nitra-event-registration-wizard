@@ -58,8 +58,8 @@ const LABEL_CLASS: Record<Status, string> = {
           />
           <q-icon
             v-else-if="statusOf(step.n) === 'error'"
-            name="error"
-            size="18px"
+            name="priority_high"
+            size="16px"
           />
           <template v-else>{{ step.n }}</template>
         </span>

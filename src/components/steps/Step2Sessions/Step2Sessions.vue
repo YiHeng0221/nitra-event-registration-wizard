@@ -116,17 +116,17 @@ function spotsClass(session: Session): string {
           />
         </div>
 
-        <h3 class="text-subtitle1 text-neutral mt-2 font-semibold">
+        <h3 class="text-subtitle1 text-neutral font-semibold">
           {{ session.title }}
         </h3>
         <p class="text-neutral-muted text-[12px]">
           {{ session.speaker }}, {{ session.speakerTitle }}
         </p>
-        <p class="text-neutral-quiet mt-1 text-[11px]">
+        <p class="text-neutral-quiet text-[11px]">
           {{ formatTimeRange(session.date, session.endDate) }}
         </p>
 
-        <div class="bg-surface-l2 mt-3 h-[6px] overflow-hidden rounded-full">
+        <div class="bg-surface-l2 h-[6px] overflow-hidden rounded-full">
           <div
             class="h-full rounded-full"
             :class="barClass(session)"
@@ -134,7 +134,7 @@ function spotsClass(session: Session): string {
           />
         </div>
         <p
-          class="mt-1 text-[11px] font-medium"
+          class="text-[11px] font-medium"
           :class="spotsClass(session)"
         >
           {{ isFull(session) ? 'Sold Out' : `${spotsLeft(session)} spots left` }}

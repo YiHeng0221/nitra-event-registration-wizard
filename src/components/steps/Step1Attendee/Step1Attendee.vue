@@ -33,10 +33,10 @@ const tickets = loadTicketTypes()
             <span class="text-subtitle1 text-neutral font-semibold">{{ ticket.name }}</span>
             <span class="text-subtitle1 text-neutral font-bold">${{ ticket.price }}</span>
           </div>
-          <p class="text-neutral-muted mt-1 text-sm">
+          <p class="text-neutral-muted text-sm">
             {{ ticket.description }}
           </p>
-          <div class="mt-3 flex flex-col gap-1.5">
+          <div class="flex flex-col gap-1.5">
             <div
               v-for="perk in ticket.perks"
               :key="perk"
@@ -52,7 +52,7 @@ const tickets = loadTicketTypes()
           </div>
           <span
             v-if="state.ticketId === ticket.id"
-            class="bg-success-bold-rest text-inverse mt-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium"
+            class="bg-success-bold-rest text-inverse inline-flex items-center gap-1 self-start rounded-full px-2 py-0.5 text-[11px] font-medium"
           >
             <q-icon
               name="check"

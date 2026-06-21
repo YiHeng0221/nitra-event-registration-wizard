@@ -121,14 +121,14 @@ function setSize(id: string, size: string | number | null): void {
             </h3>
             <span class="text-subtitle1 text-neutral font-bold">${{ workshop.price }}</span>
           </div>
-          <p class="text-neutral-muted mt-1 text-sm">
+          <p class="text-neutral-muted text-sm">
             {{ workshop.description }}
           </p>
-          <p class="text-neutral-muted mt-1 text-sm">
+          <p class="text-neutral-muted text-sm">
             {{ formatTimeRange(workshop.date, workshop.endDate) }}
           </p>
           <p
-            class="mt-2 text-xs font-medium"
+            class="text-xs font-medium"
             :class="workshopFull(workshop) || unavailableWorkshopIds.has(workshop.id) ? 'text-danger' : 'text-neutral-quiet'"
           >
             <template v-if="workshopFull(workshop)">
@@ -161,7 +161,7 @@ function setSize(id: string, size: string | number | null): void {
             </h3>
             <span class="text-subtitle1 text-neutral font-bold">${{ meal.price }}</span>
           </div>
-          <p class="text-neutral-muted mt-1 text-sm">
+          <p class="text-neutral-muted text-sm">
             {{ meal.description }}
           </p>
         </SelectableCard>
@@ -180,7 +180,7 @@ function setSize(id: string, size: string | number | null): void {
           <p class="font-semibold">
             Shipping Information
           </p>
-          <p class="mt-1">
+          <p class="">
             Merchandise items will be shipped to your address one week before the conference. Please
             ensure your shipping address in Step 1 is correct.
           </p>
@@ -197,11 +197,11 @@ function setSize(id: string, size: string | number | null): void {
             </h3>
             <span class="text-subtitle1 text-neutral font-bold">${{ item.price }}</span>
           </div>
-          <p class="text-neutral-muted mt-1 text-sm">
+          <p class="text-neutral-muted text-sm">
             {{ item.description }}
           </p>
 
-          <div class="mt-3 flex flex-wrap items-center gap-4">
+          <div class="flex flex-wrap items-center gap-4">
             <div
               v-if="item.sizes"
               class="flex items-center gap-2"
@@ -241,7 +241,7 @@ function setSize(id: string, size: string | number | null): void {
 
           <p
             v-if="quantityOf(item.id) > 0"
-            class="text-[var(--bg-brand-emphasis-rest)] mt-2 flex items-center gap-1 text-[11px] font-medium"
+            class="text-success flex items-center gap-1 text-[11px] font-medium"
           >
             <q-icon
               name="check"

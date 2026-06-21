@@ -65,6 +65,13 @@ const addonRows = computed<AddonRow[]>(() => {
 function editStep(step: number): void {
   state.currentStep = step
 }
+
+/** Red border on a review section when its step has unmet required fields. */
+function sectionErrorClass(step: number): string {
+  return errorList.value.some((item) => item.step === step)
+    ? 'border-2 border-solid border-[color:var(--border-danger-emphasis)]'
+    : ''
+}
 </script>
 
 <template>
@@ -78,7 +85,10 @@ function editStep(step: number): void {
       :items="errorList"
     />
 
-    <Paper :level="1">
+    <Paper
+      :level="1"
+      :class="sectionErrorClass(1)"
+    >
       <div class="mb-3 flex items-center justify-between">
         <h3 class="text-subtitle1 text-neutral font-semibold">
           Attendee Information
@@ -107,7 +117,10 @@ function editStep(step: number): void {
       </dl>
     </Paper>
 
-    <Paper :level="1">
+    <Paper
+      :level="1"
+      :class="sectionErrorClass(2)"
+    >
       <div class="mb-3 flex items-center justify-between">
         <h3 class="text-subtitle1 text-neutral font-semibold">
           Selected Sessions
@@ -136,7 +149,10 @@ function editStep(step: number): void {
       </div>
     </Paper>
 
-    <Paper :level="1">
+    <Paper
+      :level="1"
+      :class="sectionErrorClass(3)"
+    >
       <div class="mb-3 flex items-center justify-between">
         <h3 class="text-subtitle1 text-neutral font-semibold">
           Add-ons

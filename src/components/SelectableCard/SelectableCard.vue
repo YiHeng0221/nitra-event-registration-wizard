@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import VStack from 'src/components/Stack/VStack.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -17,7 +18,6 @@ const emit = defineEmits<{ select: [] }>()
 
 const selectable = computed(() => !props.disabled && !props.full)
 
-// Static so UnoCSS keeps every class.
 const SURFACE = {
   0: 'bg-surface-l0',
   1: 'bg-surface-l1',
@@ -26,9 +26,12 @@ const SURFACE = {
 } as const
 
 const cardClass = computed(() => {
-  if (props.selected) return 'bg-brand-subtle-rest border-2 border-brand-emphasis'
-  if (props.disabled || props.full) return 'bg-surface-l2 border border-neutral-muted'
-  return `${SURFACE[props.level]} border border-neutral-muted`
+  // `border-[color:var(...)]` forces colour interpretation so border-width sticks.
+  if (props.selected) {
+    return 'bg-brand-subtle-rest border-2 border-solid border-[color:var(--border-brand-emphasis)]'
+  }
+  const bg = props.disabled || props.full ? 'bg-surface-l2' : SURFACE[props.level]
+  return `${bg} border border-solid border-[color:var(--border-neutral-muted)]`
 })
 
 function activate(): void {
@@ -53,6 +56,8 @@ function onKeydown(event: KeyboardEvent): void {
     @click="activate"
     @keydown="onKeydown"
   >
-    <slot />
+    <VStack :gap="2">
+      <slot />
+    </VStack>
   </div>
 </template>
