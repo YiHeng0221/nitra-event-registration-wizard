@@ -35,22 +35,27 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           # Use the workflow's built-in token so the Claude GitHub App is not required.
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Post + update a visible PR comment with the review (otherwise a clean
+          # review posts nothing and the green check is meaningless).
+          track_progress: true
           # Load the project's skill so review follows our three-lens rubric.
           claude_args: "--model sonnet --setting-sources project"
           prompt: |
             Review this pull request using the project's code-review skill at
-            .claude/skills/code-review/SKILL.md.
+            .claude/skills/code-review/SKILL.md. Do not modify code — review only.
 
-            Apply the three lenses in order — (1) correctness & business logic,
+            Apply the three lenses — (1) correctness & business logic,
             (2) Vue patterns & design fidelity, (3) architecture & quality —
-            and honour this repo's rules in CLAUDE.md and the ADRs in doc/.
+            honouring CLAUDE.md and the ADRs in doc/. Watch the graded business
+            rules: prices from src/mocks/event.js, VIP 10% discount on workshops
+            only, shipping-required-when-merch, capacity/overlap availability,
+            deferred submit-time validation (never gate navigation).
 
-            Pay special attention to the graded business rules: prices read from
-            src/mocks/event.js, VIP 10% discount on workshops only, conditional
-            shipping-address-required-when-merch, capacity/overlap availability,
-            and deferred submit-time validation (never gate navigation).
+            ALWAYS post a single summary PR comment (even when the PR is clean),
+            containing:
+            - a one-line `VERDICT: pass | changes-requested`
+            - the per-lens findings table with counts
+            - each finding tagged 🔴 / 🟡 / 🟣 with `file:line` and a one-line reason (cap nits at 5)
+            - if nothing to flag, say "No blocking issues found" and explain briefly what you checked
 
-            Post findings as inline PR review comments, each tagged 🔴 / 🟡 / 🟣
-            with file:line and a one-line reason. Cap nits at 5. End with the
-            review-summary table and a `VERDICT: pass | changes-requested` line.
-            Do not modify code — review only.
+            Where useful, also leave inline comments on specific lines.
