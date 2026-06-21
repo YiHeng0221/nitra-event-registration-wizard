@@ -61,7 +61,7 @@ function fillPercent(session: Session): number {
         type="button"
         role="radio"
         :aria-checked="activeDay === day"
-        class="rounded-md px-3 py-1 text-subtitle2 transition-colors"
+        class="cursor-pointer rounded-md border-0 bg-transparent px-3 py-1 text-subtitle2 transition-colors"
         :class="
           activeDay === day
             ? 'bg-brand-emphasis-rest text-inverse'

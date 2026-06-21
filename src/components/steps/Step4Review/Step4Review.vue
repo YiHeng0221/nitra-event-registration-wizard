@@ -77,7 +77,7 @@ function editStep(step: number): void {
         </h3>
         <button
           type="button"
-          class="text-brand text-sm font-medium"
+          class="text-brand cursor-pointer border-0 bg-transparent text-sm font-medium underline-offset-2 hover:underline"
           @click="editStep(1)"
         >
           Edit → Step 1
@@ -106,7 +106,7 @@ function editStep(step: number): void {
         </h3>
         <button
           type="button"
-          class="text-brand text-sm font-medium"
+          class="text-brand cursor-pointer border-0 bg-transparent text-sm font-medium underline-offset-2 hover:underline"
           @click="editStep(2)"
         >
           Edit → Step 2
@@ -135,7 +135,7 @@ function editStep(step: number): void {
         </h3>
         <button
           type="button"
-          class="text-brand text-sm font-medium"
+          class="text-brand cursor-pointer border-0 bg-transparent text-sm font-medium underline-offset-2 hover:underline"
           @click="editStep(3)"
         >
           Edit → Step 3
