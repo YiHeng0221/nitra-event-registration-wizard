@@ -54,7 +54,7 @@ function submit(): void {
 </script>
 
 <template>
-  <div class="bg-surface-l0 overflow-hidden rounded-xl">
+  <div class="bg-surface-l0 min-h-screen">
     <!-- Header -->
     <AppHeader />
     <div class="border-neutral-muted border-t" />
