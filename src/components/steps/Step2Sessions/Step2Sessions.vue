@@ -69,7 +69,7 @@ function spotsClass(session: Session): string {
     <div
       role="radiogroup"
       aria-label="Conference day"
-      class="bg-surface-l2 inline-flex w-fit gap-1 rounded-md p-1"
+      class="bg-surface-l2 inline-flex w-fit gap-1 rounded-[10px] p-1"
     >
       <button
         v-for="day in days"
@@ -77,11 +77,11 @@ function spotsClass(session: Session): string {
         type="button"
         role="radio"
         :aria-checked="activeDay === day"
-        class="cursor-pointer rounded-md border-0 bg-transparent px-3 py-1.5 text-[14px] font-semibold transition-colors"
+        class="cursor-pointer rounded-[8px] border-0 px-5 py-2 text-[13px] transition-colors"
         :class="
           activeDay === day
-            ? 'bg-brand-emphasis-rest text-inverse'
-            : 'text-neutral-muted hover:bg-surface-l3'
+            ? 'bg-brand-emphasis-rest text-inverse font-semibold'
+            : 'text-neutral-muted hover:bg-surface-l3 bg-transparent font-medium'
         "
         @click="activeDay = day"
       >

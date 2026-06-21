@@ -82,7 +82,7 @@ function setSize(id: string, size: string | number | null): void {
 
       <div
         role="tablist"
-        class="bg-surface-l2 mb-4 inline-flex w-fit gap-1 rounded-lg p-1"
+        class="bg-surface-l2 mb-4 inline-flex w-fit gap-1 rounded-[10px] p-1"
       >
         <button
           v-for="entry in CATEGORIES"
@@ -90,11 +90,11 @@ function setSize(id: string, size: string | number | null): void {
           type="button"
           role="tab"
           :aria-selected="category === entry.key"
-          class="cursor-pointer rounded-md border-0 bg-transparent px-3 py-1 text-subtitle2 transition-colors"
+          class="cursor-pointer rounded-[8px] border-0 px-5 py-2 text-[13px] transition-colors"
           :class="
             category === entry.key
-              ? 'bg-brand-emphasis-rest text-inverse'
-              : 'text-neutral-muted hover:bg-surface-l3'
+              ? 'bg-brand-emphasis-rest text-inverse font-semibold'
+              : 'text-neutral-muted hover:bg-surface-l3 bg-transparent font-medium'
           "
           @click="category = entry.key"
         >
