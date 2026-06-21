@@ -35,9 +35,9 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           # Use the workflow's built-in token so the Claude GitHub App is not required.
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Post + update a visible PR comment with the review (otherwise a clean
+          # Post the review as a single sticky PR comment (otherwise a clean
           # review posts nothing and the green check is meaningless).
-          track_progress: true
+          use_sticky_comment: true
           # Load the project's skill so review follows our three-lens rubric.
           claude_args: "--model sonnet --setting-sources project"
           prompt: |
