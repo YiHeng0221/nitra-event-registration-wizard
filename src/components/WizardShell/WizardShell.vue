@@ -4,6 +4,7 @@ import { useRegistration } from 'src/composables/useRegistration'
 import { useValidation, type ValidationResult } from 'src/composables/useValidation'
 import AppHeader from 'src/components/AppHeader/AppHeader.vue'
 import Stepper, { type StepItem } from 'src/components/Stepper/Stepper.vue'
+import Text from 'src/components/Text/Text.vue'
 
 const emit = defineEmits<{ submit: [] }>()
 
@@ -101,19 +102,31 @@ function submit(): void {
       <button
         v-if="state.currentStep > 1"
         type="button"
-        class="text-neutral text-subtitle2 bg-surface-l2 hover:bg-surface-l3 cursor-pointer rounded-md border-0 px-4 py-2 font-medium"
+        class="bg-surface-l2 hover:bg-surface-l3 cursor-pointer rounded-md border-0 px-4 py-2"
         @click="goBack"
       >
-        Back
+        <Text
+          as="span"
+          variant="subtitle2"
+          color="neutral"
+        >
+          Back
+        </Text>
       </button>
       <span v-else />
 
       <button
         type="button"
-        class="bg-accent-emphasis-rest hover:bg-accent-emphasis-hover text-inverse cursor-pointer rounded-[10px] border-0 px-5 py-2 text-[14px] font-semibold leading-5"
+        class="bg-accent-emphasis-rest hover:bg-accent-emphasis-hover cursor-pointer rounded-[10px] border-0 px-5 py-2"
         @click="isLastStep ? submit() : goNext()"
       >
-        {{ isLastStep ? 'Submit Registration' : NEXT_LABEL[state.currentStep] }}
+        <Text
+          as="span"
+          variant="subtitle2"
+          color="inverse"
+        >
+          {{ isLastStep ? 'Submit Registration' : NEXT_LABEL[state.currentStep] }}
+        </Text>
       </button>
     </div>
   </div>

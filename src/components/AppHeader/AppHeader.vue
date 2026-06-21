@@ -1,5 +1,6 @@
 <script setup lang="ts">
 // App header: logo emblem + event name. Left-aligned on desktop, centered on mobile.
+import Text from 'src/components/Text/Text.vue'
 </script>
 
 <template>
@@ -12,7 +13,13 @@
           class="text-inverse"
         />
       </span>
-      <span class="text-subtitle1 text-neutral font-bold">WebDev Summit 2028</span>
+      <Text
+        as="span"
+        variant="subtitle1"
+        color="neutral"
+      >
+        WebDev Summit 2028
+      </Text>
     </div>
   </header>
 </template>

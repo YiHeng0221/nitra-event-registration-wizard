@@ -10,6 +10,8 @@ export type TextVariant =
   | 'subtitle1'
   | 'subtitle2'
   | 'body-lg'
+  | 'body-md'
+  | 'body-md-semibold'
   | 'body'
   | 'body-medium'
   | 'body-xs'
@@ -32,13 +34,14 @@ export type TextColor =
 const props = withDefaults(
   defineProps<{
     variant?: TextVariant
+    /** Omit to colour via a class on the element instead (e.g. dynamic colours). */
     color?: TextColor
     /** Override the rendered tag (defaults per variant). */
     as?: string
     align?: 'left' | 'center' | 'right'
     nowrap?: boolean
   }>(),
-  { variant: 'body', color: 'neutral' },
+  { variant: 'body' },
 )
 
 interface VariantSpec {
@@ -56,6 +59,8 @@ const VARIANTS: Record<TextVariant, VariantSpec> = {
   subtitle1: { size: 16, weight: 600, lineHeight: 20, tag: 'p' },
   subtitle2: { size: 14, weight: 600, lineHeight: 20, tag: 'p' },
   'body-lg': { size: 16, weight: 485, lineHeight: 24, tag: 'p' },
+  'body-md': { size: 14, weight: 485, lineHeight: 20, tag: 'p' },
+  'body-md-semibold': { size: 14, weight: 640, lineHeight: 20, tag: 'p' },
   body: { size: 12, weight: 485, lineHeight: 16, tag: 'p' },
   'body-medium': { size: 12, weight: 550, lineHeight: 16, tag: 'p' },
   'body-xs': { size: 11, weight: 485, lineHeight: 14, tag: 'p' },
@@ -92,7 +97,7 @@ const style = computed(() => ({
   <component
     :is="tag"
     class="m-0 p-0"
-    :class="COLOR_CLASS[color]"
+    :class="color ? COLOR_CLASS[color] : undefined"
     :style="style"
   >
     <slot />

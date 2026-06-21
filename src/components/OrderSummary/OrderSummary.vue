@@ -5,6 +5,7 @@ import { usePricing } from 'src/composables/usePricing'
 import { loadTicketTypes } from 'src/data/tickets'
 import { loadAddons } from 'src/data/addons'
 import Paper from 'src/components/Paper/Paper.vue'
+import Text from 'src/components/Text/Text.vue'
 
 withDefaults(
   defineProps<{
@@ -48,32 +49,67 @@ const lines = computed<SummaryLine[]>(() => {
     :level="1"
     padding="md"
   >
-    <h3 class="text-subtitle1 text-neutral mb-3 font-semibold">
+    <Text
+      as="h3"
+      variant="subtitle1"
+      color="neutral"
+      class="mb-3"
+    >
       {{ title }}
-    </h3>
+    </Text>
 
     <div class="flex flex-col gap-2">
       <div
         v-for="(line, index) in lines"
         :key="index"
-        class="flex items-center justify-between text-sm"
+        class="flex items-center justify-between"
       >
-        <span class="text-neutral-muted">{{ line.label }}</span>
-        <span class="text-neutral">{{ formatCurrency(line.amount) }}</span>
+        <Text
+          variant="body"
+          color="muted"
+        >
+          {{ line.label }}
+        </Text>
+        <Text
+          variant="body"
+          color="neutral"
+        >
+          {{ formatCurrency(line.amount) }}
+        </Text>
       </div>
 
       <div
         v-if="discount > 0"
-        class="flex items-center justify-between text-sm"
+        class="flex items-center justify-between"
       >
-        <span class="text-brand">Workshop discount (VIP 10%)</span>
-        <span class="text-brand">-{{ formatCurrency(discount) }}</span>
+        <Text
+          variant="body"
+          color="brand"
+        >
+          Workshop discount (VIP 10%)
+        </Text>
+        <Text
+          variant="body"
+          color="brand"
+        >
+          -{{ formatCurrency(discount) }}
+        </Text>
       </div>
     </div>
 
     <div class="border-neutral-muted mt-3 flex items-center justify-between border-t pt-3">
-      <span class="text-subtitle2 text-neutral font-semibold">{{ totalLabel }}</span>
-      <span class="text-subtitle1 text-neutral font-bold">{{ formatCurrency(total) }}</span>
+      <Text
+        variant="subtitle2"
+        color="neutral"
+      >
+        {{ totalLabel }}
+      </Text>
+      <Text
+        variant="subtitle1"
+        color="neutral"
+      >
+        {{ formatCurrency(total) }}
+      </Text>
     </div>
   </Paper>
 </template>

@@ -4,6 +4,7 @@ import { useValidation } from 'src/composables/useValidation'
 import { loadTicketTypes } from 'src/data/tickets'
 import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
 import AppInput from 'src/components/AppInput/AppInput.vue'
+import Text from 'src/components/Text/Text.vue'
 
 const { state } = useRegistration()
 const { errorFor } = useValidation()
@@ -13,34 +14,59 @@ const tickets = loadTicketTypes()
 <template>
   <div class="flex flex-col gap-8">
     <section>
-      <h2 class="text-subtitle1 text-neutral mb-3">
+      <Text
+        as="h2"
+        variant="subtitle1"
+        color="neutral"
+        class="mb-3"
+      >
         Select Ticket Type
-      </h2>
-      <p
+      </Text>
+      <Text
         v-if="errorFor('ticketId')"
-        class="text-danger mb-2 text-sm"
+        variant="body-md"
+        color="danger"
+        class="mb-2"
       >
         {{ errorFor('ticketId') }}
-      </p>
+      </Text>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         <SelectableCard
           v-for="ticket in tickets"
           :key="ticket.id"
           :selected="state.ticketId === ticket.id"
+          class="h-[288px]"
           @select="state.ticketId = ticket.id"
         >
           <div class="flex items-start justify-between">
-            <span class="text-subtitle1 text-neutral font-semibold">{{ ticket.name }}</span>
-            <span class="text-subtitle1 text-neutral font-bold">${{ ticket.price }}</span>
+            <Text
+              variant="subtitle1"
+              color="neutral"
+              as="span"
+            >
+              {{ ticket.name }}
+            </Text>
+            <Text
+              variant="subtitle1"
+              color="neutral"
+              as="span"
+            >
+              ${{ ticket.price }}
+            </Text>
           </div>
-          <p class="text-neutral-muted text-sm">
+          <Text
+            variant="body"
+            color="muted"
+          >
             {{ ticket.description }}
-          </p>
+          </Text>
           <div class="flex flex-col gap-1.5">
-            <div
+            <Text
               v-for="perk in ticket.perks"
               :key="perk"
-              class="text-neutral flex items-center gap-2 text-[12px]"
+              variant="body"
+              color="neutral"
+              class="flex items-center gap-2"
             >
               <q-icon
                 name="check_circle"
@@ -48,26 +74,36 @@ const tickets = loadTicketTypes()
                 class="text-neutral"
               />
               {{ perk }}
-            </div>
+            </Text>
           </div>
           <span
             v-if="state.ticketId === ticket.id"
-            class="bg-success-bold-rest text-inverse inline-flex items-center gap-1 self-start rounded-full px-2 py-0.5 text-[11px] font-medium"
+            class="bg-success-bold-rest inline-flex items-center gap-1 self-start rounded-full px-2 py-0.5"
           >
             <q-icon
               name="check"
               size="14px"
+              class="text-inverse"
             />
-            Selected
+            <Text
+              variant="body-xs-medium"
+              color="inverse"
+              as="span"
+            >Selected</Text>
           </span>
         </SelectableCard>
       </div>
     </section>
 
     <section>
-      <h2 class="text-h6 text-neutral mb-4 font-bold">
+      <Text
+        as="h2"
+        variant="h4"
+        color="neutral"
+        class="mb-4"
+      >
         Attendee Information
-      </h2>
+      </Text>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <AppInput
           v-model="state.attendee.fullName"

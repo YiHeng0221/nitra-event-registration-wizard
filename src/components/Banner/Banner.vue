@@ -30,7 +30,7 @@ const appearance = computed(() => VARIANT[props.variant])
       class="mt-0.5 shrink-0"
       :class="appearance.icon"
     />
-    <div class="flex-1 text-[14px] leading-5">
+    <div class="flex-1">
       <slot />
     </div>
     <div v-if="$slots.actions">

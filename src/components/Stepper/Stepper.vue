@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Text from 'src/components/Text/Text.vue'
+
 export interface StepItem {
   n: number
   label: string
@@ -30,8 +32,8 @@ const CIRCLE_CLASS: Record<Status, string> = {
 }
 const LABEL_CLASS: Record<Status, string> = {
   done: 'text-neutral',
-  current: 'text-neutral font-semibold',
-  error: 'text-danger font-semibold',
+  current: 'text-neutral',
+  error: 'text-danger',
   future: 'text-neutral-muted',
 }
 </script>
@@ -48,7 +50,7 @@ const LABEL_CLASS: Record<Status, string> = {
         @click="emit('navigate', step.n)"
       >
         <span
-          class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold"
+          class="flex h-8 w-8 items-center justify-center rounded-full"
           :class="CIRCLE_CLASS[statusOf(step.n)]"
         >
           <q-icon
@@ -61,14 +63,20 @@ const LABEL_CLASS: Record<Status, string> = {
             name="priority_high"
             size="16px"
           />
-          <template v-else>{{ step.n }}</template>
+          <Text
+            v-else
+            as="span"
+            variant="body-medium"
+          >{{ step.n }}</Text>
         </span>
-        <span
-          class="text-subtitle2 whitespace-nowrap"
+        <Text
+          as="span"
+          variant="subtitle2"
           :class="LABEL_CLASS[statusOf(step.n)]"
+          nowrap
         >
           {{ step.label }}
-        </span>
+        </Text>
       </button>
 
       <span

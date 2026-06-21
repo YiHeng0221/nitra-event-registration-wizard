@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import type { ErrorListItem } from 'src/composables/useValidation'
+import Text from 'src/components/Text/Text.vue'
+import VStack from 'src/components/Stack/VStack.vue'
 
 defineProps<{ items: ErrorListItem[] }>()
 </script>
 
 <template>
   <div class="bg-danger-muted-rest border-danger-muted text-danger flex flex-col gap-2 rounded-md border p-4">
-    <p class="text-[12px] font-medium">
+    <Text variant="body-medium">
       Please fix the following errors before submitting
-    </p>
-    <p
-      v-for="(item, index) in items"
-      :key="index"
-      class="text-[12px]"
-    >
-      • Step {{ item.step }}: {{ item.message }}
-    </p>
+    </Text>
+    <VStack :gap="2">
+      <Text
+        v-for="(item, index) in items"
+        :key="index"
+        variant="body"
+      >
+        • Step {{ item.step }}: {{ item.message }}
+      </Text>
+    </VStack>
   </div>
 </template>

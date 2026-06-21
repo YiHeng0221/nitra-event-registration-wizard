@@ -11,6 +11,7 @@ import type { Session } from 'src/types/session'
 import Paper from 'src/components/Paper/Paper.vue'
 import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
 import ErrorBanner from 'src/components/ErrorBanner/ErrorBanner.vue'
+import Text from 'src/components/Text/Text.vue'
 
 const { state } = useRegistration()
 const { formatCurrency } = usePricing()
@@ -76,9 +77,13 @@ function sectionErrorClass(step: number): string {
 
 <template>
   <div class="flex flex-col gap-6">
-    <h2 class="text-h6 text-neutral font-bold">
+    <Text
+      as="h2"
+      variant="h4"
+      color="neutral"
+    >
       Review Your Registration
-    </h2>
+    </Text>
 
     <ErrorBanner
       v-if="errorList.length > 0"
@@ -90,12 +95,16 @@ function sectionErrorClass(step: number): string {
       :class="sectionErrorClass(1)"
     >
       <div class="mb-3 flex items-center justify-between">
-        <h3 class="text-subtitle1 text-neutral font-semibold">
+        <Text
+          as="h3"
+          variant="subtitle1"
+          color="neutral"
+        >
           Attendee Information
-        </h3>
+        </Text>
         <button
           type="button"
-          class="text-brand cursor-pointer border-0 bg-transparent text-sm font-medium underline-offset-2 hover:underline"
+          class="text-brand cursor-pointer border-0 bg-transparent underline-offset-2 hover:underline"
           @click="editStep(1)"
         >
           Edit → Step 1
@@ -105,14 +114,22 @@ function sectionErrorClass(step: number): string {
         <div
           v-for="row in attendeeRows"
           :key="row.label"
-          class="flex items-center justify-between text-sm"
+          class="flex items-center justify-between"
         >
-          <dt class="text-neutral-muted">
+          <Text
+            as="dt"
+            variant="body"
+            color="muted"
+          >
             {{ row.label }}
-          </dt>
-          <dd class="text-neutral">
+          </Text>
+          <Text
+            as="dd"
+            variant="body"
+            color="neutral"
+          >
             {{ row.value || '—' }}
-          </dd>
+          </Text>
         </div>
       </dl>
     </Paper>
@@ -122,30 +139,49 @@ function sectionErrorClass(step: number): string {
       :class="sectionErrorClass(2)"
     >
       <div class="mb-3 flex items-center justify-between">
-        <h3 class="text-subtitle1 text-neutral font-semibold">
+        <Text
+          as="h3"
+          variant="subtitle1"
+          color="neutral"
+        >
           Selected Sessions
-        </h3>
+        </Text>
         <button
           type="button"
-          class="text-brand cursor-pointer border-0 bg-transparent text-sm font-medium underline-offset-2 hover:underline"
+          class="text-brand cursor-pointer border-0 bg-transparent underline-offset-2 hover:underline"
           @click="editStep(2)"
         >
           Edit → Step 2
         </button>
       </div>
-      <p
+      <Text
         v-if="selectedSessions.length === 0"
-        class="text-neutral-muted text-sm"
+        variant="body"
+        color="muted"
       >
         No sessions selected.
-      </p>
+      </Text>
       <div
         v-for="session in selectedSessions"
         :key="session.id"
-        class="flex items-center justify-between gap-4 text-sm"
+        class="flex items-center justify-between gap-4"
       >
-        <span class="text-neutral-muted whitespace-nowrap">{{ formatDateTime(session.date) }}</span>
-        <span class="text-neutral text-right">{{ session.title }}</span>
+        <Text
+          as="span"
+          variant="body"
+          color="muted"
+          nowrap
+        >
+          {{ formatDateTime(session.date) }}
+        </Text>
+        <Text
+          as="span"
+          variant="body"
+          color="neutral"
+          class="text-right"
+        >
+          {{ session.title }}
+        </Text>
       </div>
     </Paper>
 
@@ -154,30 +190,48 @@ function sectionErrorClass(step: number): string {
       :class="sectionErrorClass(3)"
     >
       <div class="mb-3 flex items-center justify-between">
-        <h3 class="text-subtitle1 text-neutral font-semibold">
+        <Text
+          as="h3"
+          variant="subtitle1"
+          color="neutral"
+        >
           Add-ons
-        </h3>
+        </Text>
         <button
           type="button"
-          class="text-brand cursor-pointer border-0 bg-transparent text-sm font-medium underline-offset-2 hover:underline"
+          class="text-brand cursor-pointer border-0 bg-transparent underline-offset-2 hover:underline"
           @click="editStep(3)"
         >
           Edit → Step 3
         </button>
       </div>
-      <p
+      <Text
         v-if="addonRows.length === 0"
-        class="text-neutral-muted text-sm"
+        variant="body"
+        color="muted"
       >
         No add-ons selected.
-      </p>
+      </Text>
       <div
         v-for="(row, index) in addonRows"
         :key="index"
-        class="flex items-center justify-between gap-4 text-sm"
+        class="flex items-center justify-between gap-4"
       >
-        <span class="text-neutral-muted">{{ row.type }}</span>
-        <span class="text-neutral text-right">{{ row.label }}</span>
+        <Text
+          as="span"
+          variant="body"
+          color="muted"
+        >
+          {{ row.type }}
+        </Text>
+        <Text
+          as="span"
+          variant="body"
+          color="neutral"
+          class="text-right"
+        >
+          {{ row.label }}
+        </Text>
       </div>
     </Paper>
 

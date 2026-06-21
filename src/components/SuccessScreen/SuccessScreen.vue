@@ -2,6 +2,7 @@
 import { useRegistration } from 'src/composables/useRegistration'
 import { usePricing } from 'src/composables/usePricing'
 import Paper from 'src/components/Paper/Paper.vue'
+import Text from 'src/components/Text/Text.vue'
 
 const { state } = useRegistration()
 const { total, formatCurrency } = usePricing()
@@ -18,15 +19,26 @@ const { total, formatCurrency } = usePricing()
         size="64px"
         class="text-success"
       />
-      <h2 class="text-h5 text-neutral font-bold">
+      <Text
+        as="h2"
+        variant="h3"
+        color="neutral"
+      >
         Registration Confirmed!
-      </h2>
-      <p class="text-neutral-muted">
+      </Text>
+      <Text
+        variant="body-md"
+        color="muted"
+      >
         Thanks {{ state.attendee.fullName || 'there' }}, your spot at WebDev Summit 2028 is booked.
-      </p>
-      <p class="text-neutral mt-2">
-        Total paid: <span class="font-bold">{{ formatCurrency(total) }}</span>
-      </p>
+      </Text>
+      <Text
+        variant="body-md"
+        color="neutral"
+        class="mt-2"
+      >
+        Total paid: <span>{{ formatCurrency(total) }}</span>
+      </Text>
     </div>
   </Paper>
 </template>

@@ -9,6 +9,7 @@ import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
 import NumberStepper from 'src/components/NumberStepper/NumberStepper.vue'
 import Banner from 'src/components/Banner/Banner.vue'
 import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
+import Text from 'src/components/Text/Text.vue'
 
 const { state } = useRegistration()
 const { unavailableWorkshopIds } = useConflicts()
@@ -76,9 +77,14 @@ function setSize(id: string, size: string | number | null): void {
 <template>
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
     <div class="lg:col-span-2">
-      <h2 class="text-h6 text-neutral mb-4 font-bold">
+      <Text
+        as="h2"
+        variant="h4"
+        color="neutral"
+        class="mb-4"
+      >
         Select Add-ons
-      </h2>
+      </Text>
 
       <div
         role="tablist"
@@ -110,25 +116,42 @@ function setSize(id: string, size: string | number | null): void {
         <SelectableCard
           v-for="workshop in workshops"
           :key="workshop.id"
+          :level="0"
           :selected="isWorkshopSelected(workshop.id)"
           :full="workshopFull(workshop)"
           :disabled="unavailableWorkshopIds.has(workshop.id)"
           @select="toggleWorkshop(workshop)"
         >
           <div class="flex items-start justify-between gap-2">
-            <h3 class="text-subtitle1 text-neutral font-semibold">
+            <Text
+              as="h3"
+              variant="subtitle1"
+              color="neutral"
+            >
               {{ workshop.name }}
-            </h3>
-            <span class="text-subtitle1 text-neutral font-bold">${{ workshop.price }}</span>
+            </Text>
+            <Text
+              as="span"
+              variant="subtitle1"
+              color="neutral"
+            >
+              ${{ workshop.price }}
+            </Text>
           </div>
-          <p class="text-neutral-muted text-sm">
+          <Text
+            variant="body"
+            color="muted"
+          >
             {{ workshop.description }}
-          </p>
-          <p class="text-neutral-muted text-sm">
+          </Text>
+          <Text
+            variant="body"
+            color="muted"
+          >
             {{ formatTimeRange(workshop.date, workshop.endDate) }}
-          </p>
-          <p
-            class="text-xs font-medium"
+          </Text>
+          <Text
+            variant="body-xs-medium"
             :class="workshopFull(workshop) || unavailableWorkshopIds.has(workshop.id) ? 'text-danger' : 'text-neutral-quiet'"
           >
             <template v-if="workshopFull(workshop)">
@@ -140,7 +163,7 @@ function setSize(id: string, size: string | number | null): void {
             <template v-else>
               {{ Math.max(workshop.capacity - workshop.registered, 0) }} spots remaining
             </template>
-          </p>
+          </Text>
         </SelectableCard>
       </div>
 
@@ -152,18 +175,32 @@ function setSize(id: string, size: string | number | null): void {
         <SelectableCard
           v-for="meal in meals"
           :key="meal.id"
+          :level="0"
           :selected="isMealSelected(meal.id)"
           @select="toggleMeal(meal.id)"
         >
           <div class="flex items-start justify-between gap-2">
-            <h3 class="text-subtitle1 text-neutral font-semibold">
+            <Text
+              as="h3"
+              variant="subtitle1"
+              color="neutral"
+            >
               {{ meal.name }}
-            </h3>
-            <span class="text-subtitle1 text-neutral font-bold">${{ meal.price }}</span>
+            </Text>
+            <Text
+              as="span"
+              variant="subtitle1"
+              color="neutral"
+            >
+              ${{ meal.price }}
+            </Text>
           </div>
-          <p class="text-neutral-muted text-sm">
+          <Text
+            variant="body"
+            color="muted"
+          >
             {{ meal.description }}
-          </p>
+          </Text>
         </SelectableCard>
       </div>
 
@@ -177,38 +214,64 @@ function setSize(id: string, size: string | number | null): void {
           variant="info"
           icon="info"
         >
-          <p class="font-semibold">
+          <Text
+            variant="body-md-semibold"
+            color="neutral"
+          >
             Shipping Information
-          </p>
-          <p class="">
+          </Text>
+          <Text
+            variant="body-md"
+            color="neutral"
+          >
             Merchandise items will be shipped to your address one week before the conference. Please
             ensure your shipping address in Step 1 is correct.
-          </p>
+          </Text>
         </Banner>
 
         <SelectableCard
           v-for="item in merchandise"
           :key="item.id"
+          :level="0"
           :selected="quantityOf(item.id) > 0"
         >
           <div class="flex items-start justify-between gap-2">
-            <h3 class="text-subtitle1 text-neutral font-semibold">
+            <Text
+              as="h3"
+              variant="subtitle1"
+              color="neutral"
+            >
               {{ item.name }}
-            </h3>
-            <span class="text-subtitle1 text-neutral font-bold">${{ item.price }}</span>
+            </Text>
+            <Text
+              as="span"
+              variant="subtitle1"
+              color="neutral"
+            >
+              ${{ item.price }}
+            </Text>
           </div>
-          <p class="text-neutral-muted text-sm">
+          <Text
+            variant="body"
+            color="muted"
+          >
             {{ item.description }}
-          </p>
+          </Text>
 
           <div class="flex flex-wrap items-center gap-4">
             <div
               v-if="item.sizes"
               class="flex items-center gap-2"
             >
-              <span class="text-neutral-muted text-[12px] font-medium">Size:</span>
+              <Text
+                as="span"
+                variant="body-medium"
+                color="muted"
+              >
+                Size:
+              </Text>
               <select
-                class="bg-surface-l0 border-neutral-muted text-neutral rounded-md border px-3 py-1.5 text-[12px] font-medium outline-none"
+                class="bg-surface-l0 border-neutral-muted text-neutral rounded-md border px-3 py-1.5 outline-none"
                 :value="sizeOf(item.id) ?? ''"
                 @change="setSize(item.id, ($event.target as HTMLSelectElement).value)"
               >
@@ -228,27 +291,41 @@ function setSize(id: string, size: string | number | null): void {
               </select>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-neutral-muted text-[12px] font-medium">Qty:</span>
+              <Text
+                as="span"
+                variant="body-medium"
+                color="muted"
+              >
+                Qty:
+              </Text>
               <NumberStepper
                 :model-value="quantityOf(item.id)"
                 :min="0"
                 :max="item.maxQuantity"
                 @update:model-value="setQuantity(item, $event)"
               />
-              <span class="text-neutral-quiet text-[10px]">max {{ item.maxQuantity }}</span>
+              <Text
+                as="span"
+                variant="body-xs"
+                color="quiet"
+              >
+                max {{ item.maxQuantity }}
+              </Text>
             </div>
           </div>
 
-          <p
+          <Text
             v-if="quantityOf(item.id) > 0"
-            class="text-success flex items-center gap-1 text-[11px] font-medium"
+            variant="body-xs-medium"
+            color="success"
+            class="flex items-center gap-1"
           >
             <q-icon
               name="check"
               size="14px"
             />
             Added to order
-          </p>
+          </Text>
         </SelectableCard>
       </div>
     </div>

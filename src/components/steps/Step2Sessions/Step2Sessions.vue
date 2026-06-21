@@ -6,6 +6,7 @@ import { loadSessions, groupSessionsByDate } from 'src/data/sessions'
 import { formatTimeRange, formatDayLabel } from 'src/utils/datetime'
 import type { Session, SessionTrack } from 'src/types/session'
 import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
+import Text from 'src/components/Text/Text.vue'
 
 const { state } = useRegistration()
 const { fullSessionIds } = useConflicts()
@@ -62,9 +63,13 @@ function spotsClass(session: Session): string {
 
 <template>
   <div class="flex flex-col gap-4">
-    <h2 class="text-h6 text-neutral font-bold">
+    <Text
+      as="h2"
+      variant="h4"
+      color="neutral"
+    >
       Select Sessions
-    </h2>
+    </Text>
 
     <div
       role="radiogroup"
@@ -89,9 +94,12 @@ function spotsClass(session: Session): string {
       </button>
     </div>
 
-    <p class="text-brand text-sm font-medium">
+    <Text
+      variant="body-medium"
+      color="brand"
+    >
       {{ state.selectedSessionIds.length }} session(s) selected
-    </p>
+    </Text>
 
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <SelectableCard
@@ -103,12 +111,14 @@ function spotsClass(session: Session): string {
         @select="toggle(session)"
       >
         <div class="flex items-center justify-between gap-2">
-          <span
-            class="rounded-full px-[6px] py-[3px] text-[11px] font-medium uppercase"
+          <Text
+            as="span"
+            variant="body-xs-medium"
+            class="rounded-full px-[6px] py-[3px] uppercase"
             :class="TRACK_CLASS[session.track]"
           >
             {{ session.track }}
-          </span>
+          </Text>
           <q-icon
             :name="isSelected(session.id) ? 'check_box' : 'check_box_outline_blank'"
             size="18px"
@@ -116,15 +126,25 @@ function spotsClass(session: Session): string {
           />
         </div>
 
-        <h3 class="text-subtitle1 text-neutral font-semibold">
+        <Text
+          as="h3"
+          variant="subtitle1"
+          color="neutral"
+        >
           {{ session.title }}
-        </h3>
-        <p class="text-neutral-muted text-[12px]">
+        </Text>
+        <Text
+          variant="body"
+          color="muted"
+        >
           {{ session.speaker }}, {{ session.speakerTitle }}
-        </p>
-        <p class="text-neutral-quiet text-[11px]">
+        </Text>
+        <Text
+          variant="body-xs"
+          color="quiet"
+        >
           {{ formatTimeRange(session.date, session.endDate) }}
-        </p>
+        </Text>
 
         <div class="bg-surface-l2 h-[6px] overflow-hidden rounded-full">
           <div
@@ -133,12 +153,12 @@ function spotsClass(session: Session): string {
             :style="{ width: `${fillPercent(session)}%` }"
           />
         </div>
-        <p
-          class="text-[11px] font-medium"
+        <Text
+          variant="body-xs-medium"
           :class="spotsClass(session)"
         >
           {{ isFull(session) ? 'Sold Out' : `${spotsLeft(session)} spots left` }}
-        </p>
+        </Text>
       </SelectableCard>
     </div>
   </div>
