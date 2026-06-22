@@ -1,4 +1,4 @@
-import { reactive, watch } from 'vue'
+import { nextTick, reactive, watch } from 'vue'
 import { z } from 'zod'
 import type { RegistrationState } from 'src/types/registration'
 
@@ -108,6 +108,9 @@ function reset(): void {
   } catch {
     // Ignore storage errors.
   }
+  // The deep watch fires on flush (after this call) and re-schedules a write of
+  // the fresh state; cancel it post-flush so removeItem stays the final word.
+  void nextTick(() => clearTimeout(persistTimer))
 }
 
 /** Access the single source of truth for the registration. */
