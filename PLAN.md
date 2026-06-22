@@ -130,8 +130,8 @@ API（無額外依賴）。
   以求 regression 安全。
 - **無障礙深度** — 為 segmented `OptionGroup` 加方向鍵 roving focus（ARIA radio 模式），以及步驟
   轉場時更完整的 focus 管理。
-- **接回最後一個原語** — `Select` 已在 `lib/nitra-ui`，但周邊商品尺寸用的是行內 `<select>`；我會加
-  一個行內／無 label 的 variant 讓它契合此用法。
+- **`q-icon` 收斂** — app 元件裡還有少數直接用 `q-icon` 的地方，可全部改走 `lib/nitra-ui` 的 `Icon`
+  包裝以求一致（函式庫內部已經改用了）。
 - **動畫打磨** — 更豐富的步驟轉場與選取時的微互動。
 - **真正的送出** — 把 mock 送出換成 API 呼叫，加上 loading／error 狀態與 optimistic UI。
 
