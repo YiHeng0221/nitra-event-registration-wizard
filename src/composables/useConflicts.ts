@@ -9,8 +9,8 @@ export interface UseConflicts {
   sessionConflicts: ComputedRef<Array<[string, string]>>
   /** Workshops overlapping any selected session (shown unavailable in Step 3). */
   unavailableWorkshopIds: ComputedRef<Set<string>>
-  /** Sessions at capacity (shown FULL/disabled in Step 2). */
-  fullSessionIds: ComputedRef<Set<string>>
+  /** Sessions at capacity (shown FULL/disabled in Step 2). Static — capacity never changes. */
+  fullSessionIds: Set<string>
 }
 
 /** An id'd time range with its endpoints parsed to `Date` for comparison. */
@@ -62,13 +62,12 @@ export function useConflicts(): UseConflicts {
     return new Set(overlapping.map((workshop) => workshop.id))
   })
 
-  const fullSessionIds = computed<Set<string>>(
-    () =>
-      new Set(
-        sessions
-          .filter((session) => session.registered >= session.capacity)
-          .map((session) => session.id),
-      ),
+  // Capacity is static mock data, so this never changes — compute it once as a
+  // plain Set rather than a (never-recomputing) computed.
+  const fullSessionIds = new Set(
+    sessions
+      .filter((session) => session.registered >= session.capacity)
+      .map((session) => session.id),
   )
 
   return { sessionConflicts, unavailableWorkshopIds, fullSessionIds }

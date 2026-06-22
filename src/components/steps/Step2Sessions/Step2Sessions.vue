@@ -38,7 +38,7 @@ function isSelected(id: string): boolean {
   return state.selectedSessionIds.includes(id)
 }
 function isFull(session: Session): boolean {
-  return fullSessionIds.value.has(session.id)
+  return fullSessionIds.has(session.id)
 }
 /** A selected session overlapping another, surfaced after a submit attempt. */
 function isConflicting(session: Session): boolean {
