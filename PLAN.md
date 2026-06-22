@@ -222,7 +222,6 @@ API（無額外依賴）。
 - **`q-icon` 收斂** — app 元件裡還有少數直接用 `q-icon` 的地方，可全部改走 `lib/nitra-ui` 的 `Icon`
   包裝以求一致（函式庫內部已經改用了）。
 - **動畫打磨** — 更豐富的步驟轉場與選取時的微互動。
-- **真正的送出** — 把 mock 送出換成 API 呼叫，加上 loading／error 狀態與 optimistic UI。
 
 ---
 
