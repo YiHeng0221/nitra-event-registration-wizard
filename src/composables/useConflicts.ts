@@ -13,10 +13,25 @@ export interface UseConflicts {
   fullSessionIds: ComputedRef<Set<string>>
 }
 
+/** An id'd time range with its endpoints parsed to `Date` for comparison. */
+interface TimeRange {
+  id: string
+  start: Date
+  end: Date
+}
+
+/** Parse a session/workshop's ISO endpoints into a comparable {@link TimeRange}. */
+function toRange(item: { id: string; date: string; endDate: string }): TimeRange {
+  return { id: item.id, start: new Date(item.date), end: new Date(item.endDate) }
+}
+
 /** Reactive time-conflict and availability derivations. */
 export function useConflicts(): UseConflicts {
   const { state } = useRegistration()
   const { sessions, sessionById, workshops } = useCatalog()
+
+  // Workshops are static — parse their ranges once, not per comparison.
+  const workshopRanges = workshops.map(toRange)
 
   const selectedSessions = computed<Session[]>(() =>
     state.selectedSessionIds
@@ -24,29 +39,26 @@ export function useConflicts(): UseConflicts {
       .filter((session): session is Session => session !== undefined),
   )
 
+  // Parse the selected sessions' ranges once per change, reused by both derivations below.
+  const selectedRanges = computed<TimeRange[]>(() => selectedSessions.value.map(toRange))
+
   const sessionConflicts = computed<Array<[string, string]>>(() => {
-    const picked = selectedSessions.value
+    const ranges = selectedRanges.value
     // Each session pairs only with the ones after it — slice(i + 1) avoids
     // duplicate/self pairs, preserving the original (i, j>i) iteration order.
-    return picked.flatMap((a, i) =>
-      picked
+    return ranges.flatMap((a, i) =>
+      ranges
         .slice(i + 1)
-        .filter((b) =>
-          isOverlapping(new Date(a.date), new Date(a.endDate), new Date(b.date), new Date(b.endDate)),
-        )
+        .filter((b) => isOverlapping(a.start, a.end, b.start, b.end))
         .map((b): [string, string] => [a.id, b.id]),
     )
   })
 
   const unavailableWorkshopIds = computed<Set<string>>(() => {
-    const picked = selectedSessions.value
-    const overlapping = workshops.filter((workshop) => {
-      const workshopStart = new Date(workshop.date)
-      const workshopEnd = new Date(workshop.endDate)
-      return picked.some((session) =>
-        isOverlapping(workshopStart, workshopEnd, new Date(session.date), new Date(session.endDate)),
-      )
-    })
+    const ranges = selectedRanges.value
+    const overlapping = workshopRanges.filter((workshop) =>
+      ranges.some((session) => isOverlapping(workshop.start, workshop.end, session.start, session.end)),
+    )
     return new Set(overlapping.map((workshop) => workshop.id))
   })
 
