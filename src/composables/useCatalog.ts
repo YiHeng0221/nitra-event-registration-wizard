@@ -19,19 +19,21 @@ const workshops = addons.filter(
 
 const ticketTypes = loadTicketTypes()
 
+// Exposed read-only: these are shared module-level singletons, so a stray
+// .push()/.set() by a consumer would silently corrupt the catalog for everyone.
 export interface Catalog {
   /** All sessions, in mock order. */
-  sessions: Session[]
+  sessions: ReadonlyArray<Session>
   /** Session lookup by id. */
-  sessionById: Map<string, Session>
+  sessionById: ReadonlyMap<string, Session>
   /** All add-ons, in mock order. */
-  addons: Addon[]
+  addons: ReadonlyArray<Addon>
   /** Add-on unit price by id (0 if unknown via callers' `?? 0`). */
-  addonPriceById: Map<string, number>
+  addonPriceById: ReadonlyMap<string, number>
   /** Add-ons of the `workshop` category (the only ones with a time slot). */
-  workshops: WorkshopAddon[]
+  workshops: ReadonlyArray<WorkshopAddon>
   /** Ticket tiers, in mock order. */
-  ticketTypes: TicketType[]
+  ticketTypes: ReadonlyArray<TicketType>
 }
 
 /**
