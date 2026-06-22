@@ -54,12 +54,16 @@ Introduce **`lib/nitra-ui/`** — a flat, per-component UI library outside `src/
   semantic shortcuts (`bg-surface-l0`, `text-neutral`, …); it does not duplicate them. Icons use
   Quasar's `q-icon` directly today; a thin `Icon` wrapper can centralize that later.
 
-`Checkbox` was **redesigned and wired in**: the app's only "checkbox" is the Step 2 card
-selection indicator, so `Checkbox` is now a *presentational* `check_box` indicator (icon-based;
-the parent card owns the toggle) and is used there. `Select` is **kept as an available primitive
-but not force-fit** — it is a full `FieldShell`-wrapped form field, which does not match the app's
-one inline use (the compact merchandise size `<select>` sitting beside a "Size:" label); wiring it
-in would regress that layout, so it waits for a genuine full-field use.
+Both formerly-unused primitives were **redesigned and wired in**:
+
+- `Checkbox` — the app's only "checkbox" is the Step 2 card selection indicator, so `Checkbox` is
+  now a *presentational* `check_box` indicator (icon-based; the parent card owns the toggle) and is
+  used there.
+- `Select` — rebuilt as a native `<select>` (consistent with `Input`) with an `inline` variant
+  that drops the `FieldShell` label wrapper, so it fits the compact merchandise size control beside
+  its "Size:" label. The merchandise size now uses it.
+
+So every scaffolded primitive in the kit is now actually consumed.
 
 ## Options considered
 
@@ -93,13 +97,14 @@ token docs. The move also forced the dead-primitive audit that removed real dupl
 - Positive: adding a new shared component is "drop a folder in `lib/nitra-ui`, import via `@lib`".
 - Negative: contributors must remember the split — primitives go in the lib, anything that knows
   about the wizard stays in `src/components`.
-- Neutral: `Select` stays unused until a full-field select appears; that is intentional, not an
-  oversight. (`Checkbox` was redesigned as the Step 2 selection indicator and is in use.)
+- Positive: every kit primitive is consumed — `Checkbox` (Step 2 selection indicator) and `Select`
+  (merchandise size, via its `inline` variant) were redesigned to fit real usages rather than left
+  as dead code.
 - Gotcha: Quasar's `.flex` utility sets `flex-wrap: wrap`; `OptionGroup` pins `flex-nowrap` so
   segments stay on one row.
 
 ## Revisit when
 
 - A second surface (or design-system consumer) needs the kit — consider Option C (real package).
-- A full-field select appears — wire `Select` in.
-- `q-icon` usage grows enough to warrant a centralized `Icon` wrapper in the lib.
+- The remaining direct `q-icon` call sites in app components are worth migrating to the `Icon`
+  wrapper for full consistency.

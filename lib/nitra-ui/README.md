@@ -21,7 +21,7 @@ import Button from '@lib/nitra-ui/Button/Button.vue'
 | `SelectableCard` | Clickable/selectable card (selected, full, disabled, error) |
 | `Button` | `primary` / `secondary` / `ghost` |
 | `Input` | Text field (in a `FieldShell`) |
-| `Select` | Native `<select>` field (in a `FieldShell`) — available, see ADR-0007 |
+| `Select` | Native `<select>` field; `inline` variant drops the `FieldShell` (used for merch size) |
 | `NumericInput` | Quantity stepper with min/max |
 | `Checkbox` | Presentational `check_box` indicator (parent owns the toggle) — used by Step 2 cards |
 | `Chip` | Pill/badge — `neutral` / `success` / `danger` / `custom` |

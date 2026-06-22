@@ -9,6 +9,7 @@ import type { WorkshopAddon, MealAddon, MerchandiseAddon } from 'src/types/addon
 import SelectableCard from '@lib/nitra-ui/SelectableCard/SelectableCard.vue'
 import NumericInput from '@lib/nitra-ui/NumericInput/NumericInput.vue'
 import OptionGroup from '@lib/nitra-ui/OptionGroup/OptionGroup.vue'
+import Select from '@lib/nitra-ui/Select/Select.vue'
 import Banner from '@lib/nitra-ui/Banner/Banner.vue'
 import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
 import Text from '@lib/nitra-ui/Text/Text.vue'
@@ -261,25 +262,13 @@ function setSize(id: string, size: string | number | null): void {
               >
                 {{ t('step3.size') }}
               </Text>
-              <select
-                class="bg-surface-l0 border-neutral-muted text-neutral rounded-md border px-3 py-1.5 outline-none"
-                :value="sizeOf(item.id) ?? ''"
-                @change="setSize(item.id, ($event.target as HTMLSelectElement).value)"
-              >
-                <option
-                  value=""
-                  disabled
-                >
-                  {{ t('common.select') }}
-                </option>
-                <option
-                  v-for="size in item.sizes"
-                  :key="size"
-                  :value="size"
-                >
-                  {{ size }}
-                </option>
-              </select>
+              <Select
+                inline
+                :options="item.sizes.map((size) => ({ label: size, value: size }))"
+                :placeholder="t('common.select')"
+                :model-value="sizeOf(item.id)"
+                @update:model-value="(value) => setSize(item.id, value)"
+              />
             </div>
             <div class="flex items-center gap-2">
               <Text
