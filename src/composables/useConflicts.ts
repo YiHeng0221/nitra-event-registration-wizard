@@ -25,24 +25,25 @@ function toRange(item: { id: string; date: string; endDate: string }): TimeRange
   return { id: item.id, start: new Date(item.date), end: new Date(item.endDate) }
 }
 
+// --- Static (derived from the immutable catalog, computed once at module load) ---
+const { sessions, sessionById, workshops } = useCatalog()
+
+/** Sessions at capacity. Capacity is static mock data, so this never changes. */
+const fullSessionIds = new Set(
+  sessions
+    .filter((session) => session.registered >= session.capacity)
+    .map((session) => session.id),
+)
+/** Workshop time ranges, parsed once (workshops are static). */
+const workshopRanges = workshops.map(toRange)
+
 /**
- * Time-conflict and availability derivations, grouped by lifecycle: a static
- * capacity set, a shared reactive base, then the live (Step 3) and submit-only
- * (Step 4) derivations built on it.
+ * Time-conflict and availability derivations. The static parts (full sessions,
+ * workshop ranges) live at module scope above; below is the reactive base and
+ * the live (Step 3) and submit-only (Step 4) derivations built on it.
  */
 export function useConflicts(): UseConflicts {
   const { state } = useRegistration()
-  const { sessions, sessionById, workshops } = useCatalog()
-
-  // --- Static (capacity never changes) -------------------------------------
-  // Sessions at capacity, computed once as a plain Set.
-  const fullSessionIds = new Set(
-    sessions
-      .filter((session) => session.registered >= session.capacity)
-      .map((session) => session.id),
-  )
-  // Workshops are static — parse their ranges once, not per comparison.
-  const workshopRanges = workshops.map(toRange)
 
   // --- Reactive base (recomputes with the selection) -----------------------
   const selectedSessions = computed<Session[]>(() =>
