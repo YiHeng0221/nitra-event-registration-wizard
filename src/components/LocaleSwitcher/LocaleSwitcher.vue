@@ -1,17 +1,22 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { SUPPORTED_LOCALES, LOCALE_STORAGE_KEY, type AppLocale } from 'src/i18n'
-import Text from '@lib/nitra-ui/Text/Text.vue'
+import OptionGroup from '@lib/nitra-ui/OptionGroup/OptionGroup.vue'
 
 const { locale, t } = useI18n()
 
 const LABEL: Record<AppLocale, string> = { en: 'EN', 'zh-TW': '繁中' }
+const localeOptions = computed(() =>
+  SUPPORTED_LOCALES.map((value) => ({ label: LABEL[value], value })),
+)
 
 /** Switch locale and remember the choice for next visit. */
-function setLocale(value: AppLocale): void {
-  locale.value = value
+function setLocale(value: string | number | null): void {
+  const next = value as AppLocale
+  locale.value = next
   try {
-    localStorage.setItem(LOCALE_STORAGE_KEY, value)
+    localStorage.setItem(LOCALE_STORAGE_KEY, next)
   } catch {
     // Storage unavailable — selection still applies for this session.
   }
@@ -19,27 +24,11 @@ function setLocale(value: AppLocale): void {
 </script>
 
 <template>
-  <div
-    role="group"
-    :aria-label="t('locale.label')"
-    class="bg-surface-l2 flex gap-0.5 rounded-lg p-0.5"
-  >
-    <button
-      v-for="value in SUPPORTED_LOCALES"
-      :key="value"
-      type="button"
-      :aria-pressed="locale === value"
-      class="cursor-pointer rounded-md border-0 px-2.5 py-1 transition-colors"
-      :class="locale === value ? 'bg-surface-l0 shadow-sm' : 'bg-transparent'"
-      @click="setLocale(value)"
-    >
-      <Text
-        as="span"
-        variant="body-medium"
-        :class="locale === value ? 'text-neutral' : 'text-neutral-muted'"
-      >
-        {{ LABEL[value] }}
-      </Text>
-    </button>
-  </div>
+  <OptionGroup
+    variant="pill"
+    :options="localeOptions"
+    :model-value="locale"
+    :label="t('locale.label')"
+    @update:model-value="setLocale"
+  />
 </template>

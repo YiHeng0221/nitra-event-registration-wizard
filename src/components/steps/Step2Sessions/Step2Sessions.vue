@@ -8,6 +8,8 @@ import { useLocale } from 'src/composables/useLocale'
 import { loadSessions, groupSessionsByDate } from 'src/data/sessions'
 import type { Session, SessionTrack } from 'src/types/session'
 import SelectableCard from '@lib/nitra-ui/SelectableCard/SelectableCard.vue'
+import OptionGroup from '@lib/nitra-ui/OptionGroup/OptionGroup.vue'
+import Chip from '@lib/nitra-ui/Chip/Chip.vue'
 import Text from '@lib/nitra-ui/Text/Text.vue'
 
 const { t } = useI18n()
@@ -19,6 +21,7 @@ const { sessionConflictIds } = useValidation()
 const sessionsByDay = groupSessionsByDate(loadSessions())
 const days = Object.keys(sessionsByDay)
 const activeDay = ref(days[0] ?? '')
+const dayOptions = computed(() => days.map((day) => ({ label: dayLabel(day), value: day })))
 
 const visibleSessions = computed<Session[]>(() => sessionsByDay[activeDay.value] ?? [])
 
@@ -80,28 +83,14 @@ function spotsClass(session: Session): string {
       {{ t('step2.title') }}
     </Text>
 
-    <div
-      role="radiogroup"
-      aria-label="Conference day"
-      class="bg-surface-l2 flex w-full gap-1 rounded-[10px] p-1 md:inline-flex md:w-fit"
-    >
-      <button
-        v-for="day in days"
-        :key="day"
-        type="button"
-        role="radio"
-        :aria-checked="activeDay === day"
-        class="flex-1 cursor-pointer whitespace-nowrap rounded-[8px] border-0 px-3 py-2 text-center text-[13px] transition-colors md:flex-none md:px-5"
-        :class="
-          activeDay === day
-            ? 'bg-brand-emphasis-rest text-inverse font-semibold'
-            : 'text-neutral-muted hover:bg-surface-l3 bg-transparent font-medium'
-        "
-        @click="activeDay = day"
-      >
-        {{ dayLabel(day) }}
-      </button>
-    </div>
+    <OptionGroup
+      variant="tab"
+      block
+      :options="dayOptions"
+      :model-value="activeDay"
+      :label="t('step2.title')"
+      @update:model-value="(v) => (activeDay = String(v))"
+    />
 
     <Text
       variant="body-medium"
@@ -121,14 +110,18 @@ function spotsClass(session: Session): string {
         @select="toggle(session)"
       >
         <div class="flex items-center justify-between gap-2">
-          <Text
-            as="span"
-            variant="body-xs-medium"
-            class="rounded-full px-[6px] py-[3px] uppercase"
+          <Chip
+            tone="custom"
+            class="uppercase"
             :class="TRACK_CLASS[session.track]"
           >
-            {{ trackLabel(session.track) }}
-          </Text>
+            <Text
+              as="span"
+              variant="body-xs-medium"
+            >
+              {{ trackLabel(session.track) }}
+            </Text>
+          </Chip>
           <q-icon
             :name="isSelected(session.id) ? 'check_box' : 'check_box_outline_blank'"
             size="18px"

@@ -7,6 +7,7 @@ import { useLocale } from 'src/composables/useLocale'
 import { loadTicketTypes } from 'src/data/tickets'
 import SelectableCard from '@lib/nitra-ui/SelectableCard/SelectableCard.vue'
 import Input from '@lib/nitra-ui/Input/Input.vue'
+import Chip from '@lib/nitra-ui/Chip/Chip.vue'
 import Text from '@lib/nitra-ui/Text/Text.vue'
 
 const { t } = useI18n()
@@ -85,9 +86,10 @@ const merchSelected = computed(() => Object.keys(state.merchandise).length > 0)
               {{ perkLabel(perk) }}
             </Text>
           </div>
-          <span
+          <Chip
             v-if="state.ticketId === ticket.id"
-            class="bg-success-bold-rest inline-flex items-center gap-1 self-start rounded-full px-2 py-0.5"
+            tone="success"
+            class="self-start"
           >
             <q-icon
               name="check"
@@ -98,8 +100,10 @@ const merchSelected = computed(() => Object.keys(state.merchandise).length > 0)
               variant="body-xs-medium"
               color="inverse"
               as="span"
-            >{{ t('step1.selected') }}</Text>
-          </span>
+            >
+              {{ t('step1.selected') }}
+            </Text>
+          </Chip>
         </SelectableCard>
       </div>
     </section>

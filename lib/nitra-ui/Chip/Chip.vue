@@ -1,27 +1,25 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    variant?: 'track' | 'remaining' | 'full'
-    size?: 'sm' | 'md'
+    /** Preset tone, or 'custom' to colour via a fallthrough class (e.g. track palettes). */
+    tone?: 'neutral' | 'success' | 'danger' | 'custom'
   }>(),
-  { variant: 'track', size: 'sm' },
+  { tone: 'neutral' },
 )
 
-const VARIANT = {
-  track: 'bg-surface-l2 text-neutral',
-  remaining: 'bg-info-muted-rest text-info-emphasis',
-  full: 'bg-danger-emphasis-rest text-inverse',
-} as const
-const SIZE = {
-  sm: 'text-xs px-2 py-0.5',
-  md: 'text-sm px-2.5 py-1',
-} as const
+const TONE: Record<'neutral' | 'success' | 'danger' | 'custom', string> = {
+  neutral: 'bg-surface-l2 text-neutral',
+  success: 'bg-success-bold-rest text-inverse',
+  danger: 'bg-danger-emphasis-rest text-inverse',
+  custom: '',
+}
 </script>
 
 <template>
+  <!-- A pill container; callers provide their own Text/icon content. -->
   <span
-    class="inline-flex items-center rounded-full font-medium"
-    :class="[VARIANT[variant], SIZE[size]]"
+    class="inline-flex items-center gap-1 rounded-full px-2 py-0.5"
+    :class="TONE[tone]"
   >
     <slot />
   </span>
