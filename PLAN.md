@@ -82,7 +82,7 @@ flowchart LR
 - **Mock 資料 → 整形（左）** — provided 的 `addons.js` / `sessions.js` / `event.js`（唯讀，不可改）
   經 `data loaders` 依日期／分類整形成 domain 型別。之後要換成真 API，只需改這一層。
 - **UI 層（左下）** — `WizardShell` 提供自由前後導航，渲染四個步驟與 `OrderSummary`（即時總價）；
-  元件只負責**渲染與發事件**，共用視覺原語全部來自 `lib/nitra-ui`（見 [ADR-0007](doc/0007-shared-ui-library.md)）。
+  元件只負責**渲染與發事件**，共用視覺 primitive 全部來自 `lib/nitra-ui`（見 [ADR-0007](doc/0007-shared-ui-library.md)）。
   各步驟以 **read / write** 直接讀寫中央狀態。
 - **狀態（中）** — `useRegistration` 是**唯一的真實狀態來源**（一個 `reactive` store），跨步驟保留
   資料，並持久化到 `localStorage`（用 `watch`，是這層唯一的副作用）。
@@ -104,12 +104,12 @@ flowchart LR
 
 1. **基礎建設** — 先把工具與契約立好再寫功能：ESLint 設定、husky pre-push lint 守門、`CLAUDE.md`
    專案契約，以及一個 `doc/` ADR 資料夾，把我預期會有爭議的決策（狀態管理、驗證策略）先寫下來。
-   共用原語（字體、排版、卡片、輸入框）先做，後面 step 才有得組。
+   共用 primitive（字體、排版、卡片、輸入框）先做，後面 step 才有得組。
 2. **四個步驟，逐一垂直切片** — 與會者 → 場次 → 加購 → 確認，每一步都讀寫同一個共用 store，
    外加完成頁。
 3. **業務邏輯放在純的、可測的 composable** — `usePricing`（VIP 折扣）、`useConflicts`
    （時間重疊／額滿）、`useValidation`（送出時驗證），都抽離元件。
-4. **設計還原** — 從 Figma 拉**精確數值**（不靠肉眼）並用截圖迴圈逐頁比對。
+4. **設計還原** — 從 Figma 拉**精確數值**（而非看截圖猜），再用截圖迴圈逐頁比對驗證。
 5. **打磨與 nice-to-have** — RWD、i18n（英文 + 繁中），以及把共用 UI 抽成 `lib/nitra-ui` 函式庫。
 
 較大的工作我用 GitHub issues/epics 追蹤，commit 保持 **atomic 且 Conventional Commits 格式**，
@@ -136,7 +136,7 @@ flowchart LR
   **ESLint 而非 oxlint**（[ADR-0004](doc/0004-eslint-over-oxlint.md)）；
   **pre-push lint 守門**（[ADR-0005](doc/0005-pre-push-lint-hook.md)）。
 - **共用 UI 函式庫 `lib/nitra-ui`**（[ADR-0007](doc/0007-shared-ui-library.md)）。專案後期，把
-  app-agnostic 的原語從 `src/components` 抽到一個 flat、無 barrel 的函式庫，用 `@lib` alias 引入，
+  app-agnostic 的 primitive 從 `src/components` 抽到一個 flat、無 barrel 的函式庫，用 `@lib` alias 引入，
   新增 `Button`，並讓 `OptionGroup` 成為日期 toggle、分類 tabs、語言切換器共用的單一 segmented
   control。
 
@@ -162,13 +162,13 @@ API（無額外依賴）。
 
 **有效的部分**
 
-- **用精確設計數值取代肉眼比對。** 早期還原時 AI 靠「看截圖」對齊，padding、字重、邊框色都會錯一點。
-  解法是停止肉眼比對，改用 MCP（`get_design_context` / `get_variable_defs`）從 Figma 拉**精確值**
+- **用精確設計數值取代看截圖對齊。** 早期還原時 AI 靠「看截圖」對齊，padding、字重、邊框色都會錯一點。
+  解法是不再看截圖對齊，改用 MCP（`get_design_context` / `get_variable_defs`）從 Figma 拉**精確值**
   ——真實 hex、尺寸、以及 React/Tailwind 參考碼——再翻譯成我們的 UnoCSS 語意 token。還原度立刻
   到位。*有效的 prompt：* 「用 get_design_context 跟 get_variable_defs 抓 node X 的精確 spec，
   不要看截圖猜。」
 - **會自我檢查的視覺迴圈。** 我讓 AI 用 Playwright 驅動執行中的 app、在桌機與手機寬度各截圖每個
-  步驟，再跟 Figma frame 比對——讓「看起來做好了」變成「這是截圖 vs 設計稿」。這抓到不少肉眼會漏的
+  步驟，再跟 Figma frame 比對——讓「看起來做好了」變成「這是截圖 vs 設計稿」。這抓到不少容易漏看的
   regression。
 - **每個 PR 都跑 AI code review 的 GitHub Action**，而且它**真的抓到我自己改動裡的 bug**——例如
   review workflow 每次 push 都新增留言（洗版）、某個 `Stepper` 違反自家 ADR 把函式庫耦合到
@@ -198,7 +198,7 @@ API（無額外依賴）。
 
 ## 5. 挑戰與解法
 
-- **設計還原** — 靠把肉眼比對換成 Figma MCP 精確值 + Playwright 截圖對照迴圈解決（§4）。
+- **設計還原** — 靠把看截圖對齊換成 Figma MCP 精確值 + Playwright 截圖對照迴圈解決（§4）。
 - **驗證體驗** — 「自由導航 + 送出時統一驗證」與「錯誤隨修隨清」看似衝突。解法是把可用性
   （即時 `computed`）與驗證（送出時）分開，再把錯誤狀態做成只在第一次送出後才出現、之後即時重算的
   `computed`，且永不擋導航（[ADR-0003](doc/0003-deferred-unified-validation.md)）。
