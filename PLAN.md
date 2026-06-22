@@ -8,6 +8,64 @@
 
 ---
 
+## 架構總覽
+
+```mermaid
+graph TD
+  Index["IndexPage"] --> Shell["WizardShell"]
+  Index --> Success["SuccessScreen"]
+  Shell --> Stepper["Stepper"]
+  Shell --> Steps["Step 1–4 元件"]
+  Shell --> Header["AppHeader / LocaleSwitcher"]
+
+  Steps --> Reg["useRegistration（單一 reactive 狀態源）"]
+  Steps --> Val["useValidation"]
+  Steps --> Price["usePricing"]
+  Steps --> Conf["useConflicts"]
+  Steps --> Loc["useLocale"]
+  Steps --> Kit["lib/nitra-ui 共用元件"]
+  Success --> Kit
+  Header --> Kit
+
+  Val --> Zod["zod schemas"]
+  Val --> Conf
+  Val --> I18n["vue-i18n（en / zh-TW）"]
+  Loc --> I18n
+  Reg --> Store["localStorage"]
+  Price --> Data["data loaders"]
+  Conf --> Data
+  Loc --> Data
+  Data --> Mocks["mocks（provided，唯讀）"]
+
+  classDef ui fill:#e8f0ef,stroke:#264d4f,color:#13242b;
+  classDef logic fill:#fff3e8,stroke:#fb7429,color:#5a2a0a;
+  classDef domain fill:#ececf6,stroke:#555577,color:#23233a;
+  class Index,Shell,Success,Stepper,Steps,Header,Kit ui;
+  class Reg,Val,Price,Conf,Loc logic;
+  class Zod,I18n,Data,Mocks,Store domain;
+```
+
+**分四層，依賴一律由外往內流（畫面 → 邏輯 → 領域/資料），內層不認識外層：**
+
+- **UI 層（綠）** — 頁面與功能元件。`WizardShell` 是外殼（頁首、步驟列、表單區、動作列），渲染四個
+  步驟與完成頁；元件只負責**渲染與發事件**，不放業務邏輯。所有共用視覺原語都來自 `lib/nitra-ui`
+  函式庫（見 [ADR-0007](doc/0007-shared-ui-library.md)）。
+- **Composables 層（橘）— 邏輯只放這裡。** `useRegistration` 是**唯一的真實狀態來源**（一個
+  `reactive` store，持久化到 `localStorage`）；`usePricing`／`useConflicts` 是純衍生的 `computed`
+  （VIP 折扣、時間重疊與額滿）；`useValidation` 在送出時跑、之後即時重算；`useLocale` 把語言、
+  日期格式與 mock 內容翻譯統一收斂在一處。這層全部可單獨測試，不依賴任何元件。
+- **Schema／i18n／資料層（紫）** — `zod` schema 定義驗證規則並推導型別；`vue-i18n` 提供雙語字串
+  並驅動 zod 訊息；`data loaders` 把 provided 的 `mocks`（唯讀）映射成 domain 型別，之後若要換成
+  真 API 只需改這一層。
+- **跨切面**：i18n 同時被 UI、`useValidation`、`useLocale` 消費；持久化是 `useRegistration` 唯一的
+  副作用（用 `watch`，不是 `computed`）。
+
+兩個刻意分開的概念：**可用性**（額滿、工作坊重疊 → 即時 `computed`、會 disable 控件）與**驗證**
+（整張表單在送出時跑一次、之後即時清錯），讓導航永不被擋、同時錯誤能隨修隨清
+（見 [ADR-0003](doc/0003-deferred-unified-validation.md)）。
+
+---
+
 ## 1. 如何規劃與拆解任務
 
 先讀完作業文件與 repo `README.md`，再把工作切成 **基礎建設 → 垂直切片 → 設計還原 → 收尾打磨**，
