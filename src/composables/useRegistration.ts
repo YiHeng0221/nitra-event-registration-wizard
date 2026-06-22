@@ -75,22 +75,33 @@ function loadInitialState(): RegistrationState {
 // (ADR-0001: a composable, not Pinia).
 const state = reactive<RegistrationState>(loadInitialState())
 
-// Persist on any change. Persistence is a side effect, so `watch` (not computed)
-// is the right tool here.
+/** Write the registration to localStorage (best-effort; storage may be full/blocked). */
+function persist(value: RegistrationState): void {
+  try {
+    localStorage.setItem(REGISTRATION_STORAGE_KEY, JSON.stringify(value))
+  } catch {
+    // Storage full or unavailable — non-fatal, skip persisting.
+  }
+}
+
+// Persist on change, debounced so a burst of keystrokes coalesces into one
+// write instead of re-serializing the whole state per character. Persistence is
+// a side effect, so `watch` (not computed) is the right tool here.
+const PERSIST_DEBOUNCE_MS = 200
+let persistTimer: ReturnType<typeof setTimeout> | undefined
+
 watch(
   state,
   (value) => {
-    try {
-      localStorage.setItem(REGISTRATION_STORAGE_KEY, JSON.stringify(value))
-    } catch {
-      // Storage full or unavailable — non-fatal, skip persisting.
-    }
+    clearTimeout(persistTimer)
+    persistTimer = setTimeout(() => persist(value), PERSIST_DEBOUNCE_MS)
   },
   { deep: true },
 )
 
 /** Reset the registration to a fresh state and clear persistence. */
 function reset(): void {
+  clearTimeout(persistTimer)
   Object.assign(state, createInitialState())
   try {
     localStorage.removeItem(REGISTRATION_STORAGE_KEY)
