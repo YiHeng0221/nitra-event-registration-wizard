@@ -80,11 +80,15 @@ jobs:
             selected; capacity/overlap availability; validation deferred to
             submit (never gate navigation).
 
+            WRITE THE REVIEW IN TRADITIONAL CHINESE (繁體中文). Keep code
+            identifiers, file paths, and the literal `VERDICT:` token in English;
+            write all prose (summary, reasons, headings) in 繁體中文.
+
             `review-output.md` must contain, as GitHub-flavoured markdown:
-            1. A one-paragraph summary.
+            1. A one-paragraph summary (繁體中文).
             2. Itemised findings — one bullet each, line-referenced:
-                 - `path:line` 🔴 blocker | 🟡 should-fix | 🟣 nit — one-line reason
-               Cap nits at 5. If there are no findings, say so explicitly.
+                 - `path:line` 🔴 blocker | 🟡 should-fix | 🟣 nit — 一句中文理由
+               Cap nits at 5. If there are no findings, say so explicitly (用中文).
             3. A final line: `VERDICT: pass` or `VERDICT: changes-requested`
                (changes-requested only if there is a 🔴 blocker).
 
@@ -97,17 +101,16 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           {
-            echo "## 🤖 Claude code review"
+            echo "## 🤖 Claude 程式碼審查"
             echo
             if [ -f review-output.md ] && grep -q '[^[:space:]]' review-output.md; then
               cat review-output.md
             else
-              echo "⚠️ No review was produced — the \`Generate review\` step"
-              echo "errored or timed out (commonly an expired"
-              echo "\`CLAUDE_CODE_OAUTH_TOKEN\`). See that step's logs."
+              echo "⚠️ 這次沒有產生審查內容 —— \`Generate review\` 步驟發生錯誤或逾時"
+              echo "（常見原因是 \`CLAUDE_CODE_OAUTH_TOKEN\` 過期）。請查看該步驟的 logs。"
             fi
             echo
-            echo "_Automated — posted by the claude-review workflow (updated in place)._"
+            echo "_由 claude-review workflow 自動發佈（就地更新）。_"
           } > review-body.md
           gh pr comment ${{ github.event.pull_request.number }} --body-file review-body.md --edit-last \
             || gh pr comment ${{ github.event.pull_request.number }} --body-file review-body.md
