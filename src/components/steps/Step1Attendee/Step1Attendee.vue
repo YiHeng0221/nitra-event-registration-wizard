@@ -5,9 +5,9 @@ import { useRegistration } from 'src/composables/useRegistration'
 import { useValidation } from 'src/composables/useValidation'
 import { useLocale } from 'src/composables/useLocale'
 import { loadTicketTypes } from 'src/data/tickets'
-import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
-import AppInput from 'src/components/AppInput/AppInput.vue'
-import Text from 'src/components/Text/Text.vue'
+import SelectableCard from '@lib/nitra-ui/SelectableCard/SelectableCard.vue'
+import Input from '@lib/nitra-ui/Input/Input.vue'
+import Text from '@lib/nitra-ui/Text/Text.vue'
 
 const { t } = useI18n()
 const { ticketName, ticketDesc, perkLabel } = useLocale()
@@ -114,27 +114,27 @@ const merchSelected = computed(() => Object.keys(state.merchandise).length > 0)
         {{ t('step1.attendeeInfo') }}
       </Text>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <AppInput
+        <Input
           v-model="state.attendee.fullName"
           :label="t('step1.fullName')"
           :placeholder="t('step1.fullNamePlaceholder')"
           :error="errorFor('fullName')"
         />
-        <AppInput
+        <Input
           v-model="state.attendee.email"
           type="email"
           :label="t('step1.email')"
           :placeholder="t('step1.emailPlaceholder')"
           :error="errorFor('email')"
         />
-        <AppInput
+        <Input
           v-model="state.attendee.phone"
           type="tel"
           :label="t('step1.phone')"
           :placeholder="t('step1.phonePlaceholder')"
           :error="errorFor('phone')"
         />
-        <AppInput
+        <Input
           v-model="state.attendee.company"
           :label="t('step1.company')"
           :placeholder="t('step1.companyPlaceholder')"
@@ -142,13 +142,13 @@ const merchSelected = computed(() => Object.keys(state.merchandise).length > 0)
         />
       </div>
       <div class="mt-4 flex flex-col gap-4">
-        <AppInput
+        <Input
           v-model="state.attendee.jobTitle"
           :label="t('step1.jobTitle')"
           :placeholder="t('step1.jobTitlePlaceholder')"
           :error="errorFor('jobTitle')"
         />
-        <AppInput
+        <Input
           v-model="state.attendee.shippingAddress"
           :label="merchSelected ? t('step1.shipping') : t('step1.shippingOptional')"
           :required="merchSelected"

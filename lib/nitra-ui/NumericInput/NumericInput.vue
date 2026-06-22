@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import FieldShell from 'src/components/FieldShell/FieldShell.vue'
+import FieldShell from '@lib/nitra-ui/FieldShell/FieldShell.vue'
 
 const props = withDefaults(
   defineProps<{

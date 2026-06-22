@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // App header: logo emblem + event name on the left, language switcher on the right.
-import Text from 'src/components/Text/Text.vue'
+import Text from '@lib/nitra-ui/Text/Text.vue'
 import LocaleSwitcher from 'src/components/LocaleSwitcher/LocaleSwitcher.vue'
 </script>
 

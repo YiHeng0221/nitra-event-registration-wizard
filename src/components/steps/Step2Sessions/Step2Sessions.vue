@@ -7,8 +7,8 @@ import { useValidation } from 'src/composables/useValidation'
 import { useLocale } from 'src/composables/useLocale'
 import { loadSessions, groupSessionsByDate } from 'src/data/sessions'
 import type { Session, SessionTrack } from 'src/types/session'
-import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
-import Text from 'src/components/Text/Text.vue'
+import SelectableCard from '@lib/nitra-ui/SelectableCard/SelectableCard.vue'
+import Text from '@lib/nitra-ui/Text/Text.vue'
 
 const { t } = useI18n()
 const { timeRange, dayLabel, sessionTitle, sessionSpeakerTitle, trackLabel } = useLocale()

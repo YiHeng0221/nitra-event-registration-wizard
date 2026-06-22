@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useLocale } from 'src/composables/useLocale'
 import AppHeader from 'src/components/AppHeader/AppHeader.vue'
-import Text from 'src/components/Text/Text.vue'
+import Text from '@lib/nitra-ui/Text/Text.vue'
 
 const emit = defineEmits<{ home: [] }>()
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import type { ErrorListItem } from 'src/composables/useValidation'
-import Text from 'src/components/Text/Text.vue'
-import VStack from 'src/components/Stack/VStack.vue'
+import Text from '@lib/nitra-ui/Text/Text.vue'
+import VStack from '@lib/nitra-ui/Stack/VStack.vue'
 
 defineProps<{ items: ErrorListItem[] }>()
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { SUPPORTED_LOCALES, LOCALE_STORAGE_KEY, type AppLocale } from 'src/i18n'
-import Text from 'src/components/Text/Text.vue'
+import Text from '@lib/nitra-ui/Text/Text.vue'
 
 const { locale, t } = useI18n()
 

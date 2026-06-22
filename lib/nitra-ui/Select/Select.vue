@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import FieldShell from 'src/components/FieldShell/FieldShell.vue'
+import FieldShell from '@lib/nitra-ui/FieldShell/FieldShell.vue'
 
 /** A single select option in a UI-kit-neutral shape. */
 export interface SelectOption {

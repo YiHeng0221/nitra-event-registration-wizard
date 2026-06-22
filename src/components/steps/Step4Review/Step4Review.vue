@@ -9,11 +9,11 @@ import { loadTicketTypes } from 'src/data/tickets'
 import { loadSessions } from 'src/data/sessions'
 import { loadAddons } from 'src/data/addons'
 import type { Session } from 'src/types/session'
-import Paper from 'src/components/Paper/Paper.vue'
+import Card from '@lib/nitra-ui/Card/Card.vue'
 import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
 import ErrorBanner from 'src/components/ErrorBanner/ErrorBanner.vue'
-import Text from 'src/components/Text/Text.vue'
-import VStack from 'src/components/Stack/VStack.vue'
+import Text from '@lib/nitra-ui/Text/Text.vue'
+import VStack from '@lib/nitra-ui/Stack/VStack.vue'
 
 const { t } = useI18n()
 const { dateTime, sessionTitle, ticketName, addonName } = useLocale()
@@ -111,7 +111,7 @@ function sectionErrorClass(step: number): string {
       :items="errorList"
     />
 
-    <Paper
+    <Card
       :level="1"
       :class="sectionErrorClass(1)"
     >
@@ -153,9 +153,9 @@ function sectionErrorClass(step: number): string {
           </Text>
         </div>
       </dl>
-    </Paper>
+    </Card>
 
-    <Paper
+    <Card
       :level="1"
       :class="sectionErrorClass(2)"
     >
@@ -206,9 +206,9 @@ function sectionErrorClass(step: number): string {
           </Text>
         </div>
       </VStack>
-    </Paper>
+    </Card>
 
-    <Paper
+    <Card
       :level="1"
       :class="sectionErrorClass(3)"
     >
@@ -258,7 +258,7 @@ function sectionErrorClass(step: number): string {
           </Text>
         </div>
       </VStack>
-    </Paper>
+    </Card>
 
     <OrderSummary
       :title="t('orderSummary.pricingTitle')"

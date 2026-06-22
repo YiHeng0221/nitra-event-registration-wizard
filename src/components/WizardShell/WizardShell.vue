@@ -4,8 +4,8 @@ import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useValidation } from 'src/composables/useValidation'
 import AppHeader from 'src/components/AppHeader/AppHeader.vue'
-import Stepper, { type StepItem } from 'src/components/Stepper/Stepper.vue'
-import Text from 'src/components/Text/Text.vue'
+import Stepper, { type StepItem } from '@lib/nitra-ui/Stepper/Stepper.vue'
+import Text from '@lib/nitra-ui/Text/Text.vue'
 
 const emit = defineEmits<{ submit: [] }>()
 

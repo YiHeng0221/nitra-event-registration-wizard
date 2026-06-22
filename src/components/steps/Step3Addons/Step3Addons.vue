@@ -6,11 +6,11 @@ import { useConflicts } from 'src/composables/useConflicts'
 import { useLocale } from 'src/composables/useLocale'
 import { loadAddons } from 'src/data/addons'
 import type { WorkshopAddon, MealAddon, MerchandiseAddon } from 'src/types/addon'
-import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
-import NumberStepper from 'src/components/NumberStepper/NumberStepper.vue'
-import Banner from 'src/components/Banner/Banner.vue'
+import SelectableCard from '@lib/nitra-ui/SelectableCard/SelectableCard.vue'
+import NumericInput from '@lib/nitra-ui/NumericInput/NumericInput.vue'
+import Banner from '@lib/nitra-ui/Banner/Banner.vue'
 import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
-import Text from 'src/components/Text/Text.vue'
+import Text from '@lib/nitra-ui/Text/Text.vue'
 
 const { t } = useI18n()
 const { timeRange, addonName, addonDesc } = useLocale()
@@ -300,7 +300,7 @@ function setSize(id: string, size: string | number | null): void {
               >
                 {{ t('step3.qty') }}
               </Text>
-              <NumberStepper
+              <NumericInput
                 :model-value="quantityOf(item.id)"
                 :min="0"
                 :max="item.maxQuantity"
