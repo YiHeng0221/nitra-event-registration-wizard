@@ -1,11 +1,12 @@
 import { computed, type ComputedRef } from 'vue'
 import { useRegistration } from 'src/composables/useRegistration'
-import { loadTicketTypes } from 'src/data/tickets'
-import { loadAddons } from 'src/data/addons'
+import { useCatalog } from 'src/composables/useCatalog'
 
 /** VIP perk: 10% off the workshop subtotal only. */
 const VIP_WORKSHOP_DISCOUNT_RATE = 0.1
 
+// Currency is intentionally fixed to USD / `$X,XXX.XX` regardless of UI locale
+// (per spec) — it does NOT follow the i18n locale like dates in useLocale do.
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
@@ -14,11 +15,15 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
 })
 
 export interface UsePricing {
+  /** Selected ticket tier's price, or 0 when none is chosen. */
   ticketPrice: ComputedRef<number>
+  /** Sum of the selected workshops' prices (the VIP discount base). */
   workshopSubtotal: ComputedRef<number>
+  /** Workshops + meals + merchandise (quantity-weighted); excludes the ticket. */
   addonsSubtotal: ComputedRef<number>
   /** VIP: workshop subtotal × 10%; otherwise 0. */
   discount: ComputedRef<number>
+  /** Final payable: ticket + add-ons − discount. */
   total: ComputedRef<number>
   /** Format a number as `$X,XXX.XX`. */
   formatCurrency: (amount: number) => string
@@ -27,11 +32,10 @@ export interface UsePricing {
 /** Reactive pricing derived from the registration state and the mock catalog. */
 export function usePricing(): UsePricing {
   const { state } = useRegistration()
-  const tickets = loadTicketTypes()
-  const addonPriceById = new Map(loadAddons().map((addon) => [addon.id, addon.price]))
+  const { ticketTypes, addonPriceById } = useCatalog()
 
   const ticketPrice = computed(
-    () => tickets.find((ticket) => ticket.id === state.ticketId)?.price ?? 0,
+    () => ticketTypes.find((ticket) => ticket.id === state.ticketId)?.price ?? 0,
   )
 
   const workshopSubtotal = computed(() =>

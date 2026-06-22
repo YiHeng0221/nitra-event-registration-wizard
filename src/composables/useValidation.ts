@@ -70,9 +70,13 @@ export function useValidation(): UseValidation {
     const result = registrationSchema.safeParse(state)
     if (!result.success) {
       result.error.issues.forEach((issue) => {
-        // Use the leaf path segment as the field key (e.g. attendee.fullName -> fullName).
-        const field = issue.path[issue.path.length - 1]
-        addError(String(field ?? 'form'), issue.message)
+        // Map the issue to a step-owning field key: prefer the first path segment
+        // that is a known top-level field, so nested paths resolve correctly
+        // (e.g. attendee.fullName -> fullName, merchandise.<id>.quantity -> merchandise).
+        // Falling back to the leaf alone would send merchandise errors to step 4.
+        const path = issue.path.map(String)
+        const field = path.find((segment) => Object.hasOwn(FIELD_STEP, segment)) ?? path.at(-1) ?? 'form'
+        addError(field, issue.message)
       })
     }
 

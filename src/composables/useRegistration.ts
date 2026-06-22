@@ -1,8 +1,42 @@
-import { reactive, watch } from 'vue'
+import { nextTick, reactive, watch } from 'vue'
+import { z } from 'zod'
 import type { RegistrationState } from 'src/types/registration'
 
 /** localStorage key the registration is persisted under. */
 export const REGISTRATION_STORAGE_KEY = 'nitra-registration'
+
+/**
+ * Lenient structural schema for hydrating persisted state. Each field repairs
+ * to a fresh default via `.catch()`, so a single corrupt value can't desync the
+ * shape or wipe an otherwise valid save. Business rules (required fields, time
+ * conflicts) are intentionally NOT enforced here — those run once at submit.
+ */
+const persistedStateSchema: z.ZodType<RegistrationState> = z.object({
+  currentStep: z.number().int().min(1).max(4).catch(1),
+  attendee: z
+    .object({
+      fullName: z.string().catch(''),
+      email: z.string().catch(''),
+      phone: z.string().catch(''),
+      company: z.string().catch(''),
+      jobTitle: z.string().catch(''),
+      shippingAddress: z.string().catch(''),
+    })
+    .catch({ fullName: '', email: '', phone: '', company: '', jobTitle: '', shippingAddress: '' }),
+  ticketId: z.enum(['general', 'vip', 'student']).nullable().catch(null),
+  selectedSessionIds: z.array(z.string()).catch([]),
+  selectedWorkshopIds: z.array(z.string()).catch([]),
+  selectedMealIds: z.array(z.string()).catch([]),
+  merchandise: z
+    .record(
+      z.string(),
+      z.object({
+        size: z.string().nullable().catch(null),
+        quantity: z.number().int().min(1).catch(1),
+      }),
+    )
+    .catch({}),
+})
 
 /** A fresh, empty registration. Factory so `reset()` can deep-replace cleanly. */
 function createInitialState(): RegistrationState {
@@ -26,19 +60,14 @@ function createInitialState(): RegistrationState {
 
 /** Hydrate persisted state from localStorage, falling back to a fresh state. */
 function loadInitialState(): RegistrationState {
-  const fresh = createInitialState()
   try {
     const raw = localStorage.getItem(REGISTRATION_STORAGE_KEY)
-    if (!raw) return fresh
-    const parsed = JSON.parse(raw) as Partial<RegistrationState>
-    return {
-      ...fresh,
-      ...parsed,
-      attendee: { ...fresh.attendee, ...(parsed.attendee ?? {}) },
-    }
+    if (!raw) return createInitialState()
+    // Structurally validate + repair the persisted blob (never throws).
+    return persistedStateSchema.parse(JSON.parse(raw))
   } catch {
     // Corrupt or unavailable storage — start fresh.
-    return fresh
+    return createInitialState()
   }
 }
 
@@ -46,28 +75,42 @@ function loadInitialState(): RegistrationState {
 // (ADR-0001: a composable, not Pinia).
 const state = reactive<RegistrationState>(loadInitialState())
 
-// Persist on any change. Persistence is a side effect, so `watch` (not computed)
-// is the right tool here.
+/** Write the registration to localStorage (best-effort; storage may be full/blocked). */
+function persist(value: RegistrationState): void {
+  try {
+    localStorage.setItem(REGISTRATION_STORAGE_KEY, JSON.stringify(value))
+  } catch {
+    // Storage full or unavailable — non-fatal, skip persisting.
+  }
+}
+
+// Persist on change, debounced so a burst of keystrokes coalesces into one
+// write instead of re-serializing the whole state per character. Persistence is
+// a side effect, so `watch` (not computed) is the right tool here.
+const PERSIST_DEBOUNCE_MS = 200
+let persistTimer: ReturnType<typeof setTimeout> | undefined
+
 watch(
   state,
   (value) => {
-    try {
-      localStorage.setItem(REGISTRATION_STORAGE_KEY, JSON.stringify(value))
-    } catch {
-      // Storage full or unavailable — non-fatal, skip persisting.
-    }
+    clearTimeout(persistTimer)
+    persistTimer = setTimeout(() => persist(value), PERSIST_DEBOUNCE_MS)
   },
   { deep: true },
 )
 
 /** Reset the registration to a fresh state and clear persistence. */
 function reset(): void {
+  clearTimeout(persistTimer)
   Object.assign(state, createInitialState())
   try {
     localStorage.removeItem(REGISTRATION_STORAGE_KEY)
   } catch {
     // Ignore storage errors.
   }
+  // The deep watch fires on flush (after this call) and re-schedules a write of
+  // the fresh state; cancel it post-flush so removeItem stays the final word.
+  void nextTick(() => clearTimeout(persistTimer))
 }
 
 /** Access the single source of truth for the registration. */
