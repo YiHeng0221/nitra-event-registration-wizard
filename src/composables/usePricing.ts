@@ -5,6 +5,8 @@ import { useCatalog } from 'src/composables/useCatalog'
 /** VIP perk: 10% off the workshop subtotal only. */
 const VIP_WORKSHOP_DISCOUNT_RATE = 0.1
 
+// Currency is intentionally fixed to USD / `$X,XXX.XX` regardless of UI locale
+// (per spec) — it does NOT follow the i18n locale like dates in useLocale do.
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
