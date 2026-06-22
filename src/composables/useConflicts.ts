@@ -1,10 +1,8 @@
 import { computed, type ComputedRef } from 'vue'
 import { useRegistration } from 'src/composables/useRegistration'
-import { loadSessions } from 'src/data/sessions'
-import { loadAddons } from 'src/data/addons'
+import { useCatalog } from 'src/composables/useCatalog'
 import { isOverlapping } from 'src/utils/overlap'
 import type { Session } from 'src/types/session'
-import type { WorkshopAddon } from 'src/types/addon'
 
 export interface UseConflicts {
   /** Pairs of selected session ids that overlap (surfaced only at submit). */
@@ -18,11 +16,7 @@ export interface UseConflicts {
 /** Reactive time-conflict and availability derivations. */
 export function useConflicts(): UseConflicts {
   const { state } = useRegistration()
-  const sessions = loadSessions()
-  const sessionById = new Map(sessions.map((session) => [session.id, session]))
-  const workshops = loadAddons().filter(
-    (addon): addon is WorkshopAddon => addon.category === 'workshop',
-  )
+  const { sessions, sessionById, workshops } = useCatalog()
 
   const selectedSessions = computed<Session[]>(() =>
     state.selectedSessionIds

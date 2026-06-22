@@ -1,7 +1,6 @@
 import { computed, type ComputedRef } from 'vue'
 import { useRegistration } from 'src/composables/useRegistration'
-import { loadTicketTypes } from 'src/data/tickets'
-import { loadAddons } from 'src/data/addons'
+import { useCatalog } from 'src/composables/useCatalog'
 
 /** VIP perk: 10% off the workshop subtotal only. */
 const VIP_WORKSHOP_DISCOUNT_RATE = 0.1
@@ -27,11 +26,10 @@ export interface UsePricing {
 /** Reactive pricing derived from the registration state and the mock catalog. */
 export function usePricing(): UsePricing {
   const { state } = useRegistration()
-  const tickets = loadTicketTypes()
-  const addonPriceById = new Map(loadAddons().map((addon) => [addon.id, addon.price]))
+  const { ticketTypes, addonPriceById } = useCatalog()
 
   const ticketPrice = computed(
-    () => tickets.find((ticket) => ticket.id === state.ticketId)?.price ?? 0,
+    () => ticketTypes.find((ticket) => ticket.id === state.ticketId)?.price ?? 0,
   )
 
   const workshopSubtotal = computed(() =>
