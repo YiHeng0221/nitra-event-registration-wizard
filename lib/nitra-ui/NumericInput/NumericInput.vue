@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import FieldShell from '@lib/nitra-ui/FieldShell/FieldShell.vue'
+import Icon from '@lib/nitra-ui/Icon/Icon.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -53,7 +54,7 @@ function increment(): void {
           :disabled="disabled || atMin"
           @click="decrement"
         >
-          <q-icon
+          <Icon
             name="remove"
             size="16px"
           />
@@ -71,7 +72,7 @@ function increment(): void {
           :disabled="disabled || atMax"
           @click="increment"
         >
-          <q-icon
+          <Icon
             name="add"
             size="16px"
           />

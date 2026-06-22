@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Text from '@lib/nitra-ui/Text/Text.vue'
+import Icon from '@lib/nitra-ui/Icon/Icon.vue'
 
 export interface StepItem {
   n: number
@@ -61,12 +62,12 @@ const LABEL_CLASS: Record<Status, string> = {
             class="flex h-8 w-8 items-center justify-center rounded-full"
             :class="CIRCLE_CLASS[statusOf(step.n)]"
           >
-            <q-icon
+            <Icon
               v-if="statusOf(step.n) === 'done'"
               name="check"
               size="18px"
             />
-            <q-icon
+            <Icon
               v-else-if="statusOf(step.n) === 'error'"
               name="priority_high"
               size="16px"

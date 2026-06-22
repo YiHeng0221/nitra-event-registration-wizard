@@ -14,6 +14,7 @@ context, the options weighed, and the reasoning — so the choices can be audite
 | 0004 | [ESLint + eslint-plugin-vue over oxlint](0004-eslint-over-oxlint.md) | Accepted | 2026-06-20 |
 | 0005 | [Pre-push lint gate via husky](0005-pre-push-lint-hook.md) | Accepted | 2026-06-20 |
 | 0006 | [TypeScript, with JSDoc kept for intent](0006-typescript-with-jsdoc.md) | Accepted | 2026-06-20 |
+| 0007 | [Shared UI library in lib/nitra-ui](0007-shared-ui-library.md) | Accepted | 2026-06-22 |
 
 ## When to write an ADR
 
