@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import VStack from 'src/components/Stack/VStack.vue'
+import VStack from '@lib/nitra-ui/Stack/VStack.vue'
 
 const props = withDefaults(
   defineProps<{

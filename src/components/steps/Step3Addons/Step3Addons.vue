@@ -6,11 +6,12 @@ import { useConflicts } from 'src/composables/useConflicts'
 import { useLocale } from 'src/composables/useLocale'
 import { loadAddons } from 'src/data/addons'
 import type { WorkshopAddon, MealAddon, MerchandiseAddon } from 'src/types/addon'
-import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
-import NumberStepper from 'src/components/NumberStepper/NumberStepper.vue'
-import Banner from 'src/components/Banner/Banner.vue'
+import SelectableCard from '@lib/nitra-ui/SelectableCard/SelectableCard.vue'
+import NumericInput from '@lib/nitra-ui/NumericInput/NumericInput.vue'
+import OptionGroup from '@lib/nitra-ui/OptionGroup/OptionGroup.vue'
+import Banner from '@lib/nitra-ui/Banner/Banner.vue'
 import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
-import Text from 'src/components/Text/Text.vue'
+import Text from '@lib/nitra-ui/Text/Text.vue'
 
 const { t } = useI18n()
 const { timeRange, addonName, addonDesc } = useLocale()
@@ -23,10 +24,10 @@ const meals = addons.filter((a): a is MealAddon => a.category === 'meal')
 const merchandise = addons.filter((a): a is MerchandiseAddon => a.category === 'merchandise')
 
 type CategoryKey = 'workshop' | 'meal' | 'merchandise'
-const CATEGORIES = computed<Array<{ key: CategoryKey; label: string }>>(() => [
-  { key: 'workshop', label: t('step3.catWorkshops') },
-  { key: 'meal', label: t('step3.catMeals') },
-  { key: 'merchandise', label: t('step3.catMerch') },
+const categoryOptions = computed(() => [
+  { value: 'workshop', label: t('step3.catWorkshops') },
+  { value: 'meal', label: t('step3.catMeals') },
+  { value: 'merchandise', label: t('step3.catMerch') },
 ])
 const category = ref<CategoryKey>('workshop')
 
@@ -89,27 +90,15 @@ function setSize(id: string, size: string | number | null): void {
         {{ t('step3.title') }}
       </Text>
 
-      <div
-        role="tablist"
-        class="bg-surface-l2 mb-4 flex w-full gap-1 rounded-[10px] p-1 md:inline-flex md:w-fit"
-      >
-        <button
-          v-for="entry in CATEGORIES"
-          :key="entry.key"
-          type="button"
-          role="tab"
-          :aria-selected="category === entry.key"
-          class="flex-1 cursor-pointer whitespace-nowrap rounded-[8px] border-0 px-3 py-2 text-center text-[13px] transition-colors md:flex-none md:px-5"
-          :class="
-            category === entry.key
-              ? 'bg-brand-emphasis-rest text-inverse font-semibold'
-              : 'text-neutral-muted hover:bg-surface-l3 bg-transparent font-medium'
-          "
-          @click="category = entry.key"
-        >
-          {{ entry.label }}
-        </button>
-      </div>
+      <OptionGroup
+        variant="tab"
+        block
+        class="mb-4"
+        :options="categoryOptions"
+        :model-value="category"
+        :label="t('step3.selectCategory')"
+        @update:model-value="(v) => (category = v as CategoryKey)"
+      />
 
       <!-- Workshops -->
       <div
@@ -300,7 +289,7 @@ function setSize(id: string, size: string | number | null): void {
               >
                 {{ t('step3.qty') }}
               </Text>
-              <NumberStepper
+              <NumericInput
                 :model-value="quantityOf(item.id)"
                 :min="0"
                 :max="item.maxQuantity"

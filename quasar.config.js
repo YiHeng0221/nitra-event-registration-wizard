@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url'
 import UnoCSS from 'unocss/vite'
 
 export default function () {
@@ -9,6 +10,10 @@ export default function () {
     extras: ['material-icons'],
 
     build: {
+      // Shared UI library lives outside src/ and is imported via @lib/nitra-ui/*.
+      alias: {
+        '@lib': fileURLToPath(new URL('./lib', import.meta.url)),
+      },
       target: {
         browser: ['es2022', 'firefox115', 'chrome115', 'safari14'],
       },

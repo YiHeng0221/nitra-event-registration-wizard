@@ -4,7 +4,8 @@ import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useLocale } from 'src/composables/useLocale'
 import AppHeader from 'src/components/AppHeader/AppHeader.vue'
-import Text from 'src/components/Text/Text.vue'
+import Text from '@lib/nitra-ui/Text/Text.vue'
+import Button from '@lib/nitra-ui/Button/Button.vue'
 
 const emit = defineEmits<{ home: [] }>()
 
@@ -61,19 +62,13 @@ const confirmation = `#WDS2028-${String(Math.floor(Math.random() * 90000) + 1000
         </Text>
       </div>
 
-      <button
-        type="button"
-        class="bg-accent-emphasis-rest hover:bg-accent-emphasis-hover mt-2 cursor-pointer rounded-[10px] border-0 px-4 py-2.5"
+      <Button
+        variant="primary"
+        class="mt-2"
         @click="emit('home')"
       >
-        <Text
-          as="span"
-          variant="subtitle2"
-          color="inverse"
-        >
-          {{ t('success.backHome') }}
-        </Text>
-      </button>
+        {{ t('success.backHome') }}
+      </Button>
     </div>
   </div>
 </template>

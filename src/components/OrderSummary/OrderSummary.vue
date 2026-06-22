@@ -6,8 +6,8 @@ import { usePricing } from 'src/composables/usePricing'
 import { useLocale } from 'src/composables/useLocale'
 import { loadTicketTypes } from 'src/data/tickets'
 import { loadAddons } from 'src/data/addons'
-import Paper from 'src/components/Paper/Paper.vue'
-import Text from 'src/components/Text/Text.vue'
+import Card from '@lib/nitra-ui/Card/Card.vue'
+import Text from '@lib/nitra-ui/Text/Text.vue'
 
 const props = defineProps<{
   /** Heading override; falls back to the localized "Order Summary". */
@@ -54,7 +54,7 @@ const lines = computed<SummaryLine[]>(() => {
 </script>
 
 <template>
-  <Paper
+  <Card
     :level="1"
     padding="md"
   >
@@ -120,5 +120,5 @@ const lines = computed<SummaryLine[]>(() => {
         {{ formatCurrency(total) }}
       </Text>
     </div>
-  </Paper>
+  </Card>
 </template>

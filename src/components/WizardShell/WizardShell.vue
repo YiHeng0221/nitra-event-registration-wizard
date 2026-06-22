@@ -4,8 +4,8 @@ import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useValidation } from 'src/composables/useValidation'
 import AppHeader from 'src/components/AppHeader/AppHeader.vue'
-import Stepper, { type StepItem } from 'src/components/Stepper/Stepper.vue'
-import Text from 'src/components/Text/Text.vue'
+import Stepper, { type StepItem } from '@lib/nitra-ui/Stepper/Stepper.vue'
+import Button from '@lib/nitra-ui/Button/Button.vue'
 
 const emit = defineEmits<{ submit: [] }>()
 
@@ -33,6 +33,15 @@ const errorSteps = computed(() =>
   Object.entries(stepHasError.value)
     .filter(([, hasError]) => hasError)
     .map(([step]) => Number(step)),
+)
+
+// Localized mobile "Step N of M — Label" line — built here so Stepper stays i18n-free.
+const progressLabel = computed(() =>
+  t('stepper.progress', {
+    current: state.currentStep,
+    total: STEPS.value.length,
+    label: STEPS.value.find((step) => step.n === state.currentStep)?.label ?? '',
+  }),
 )
 
 const isLastStep = computed(() => state.currentStep >= STEPS.value.length)
@@ -68,6 +77,7 @@ function submit(): void {
         :steps="STEPS"
         :current="state.currentStep"
         :error-steps="errorSteps"
+        :progress-label="progressLabel"
         @navigate="goTo"
       />
     </div>
@@ -101,35 +111,21 @@ function submit(): void {
 
     <!-- Actions — 72px -->
     <div class="flex h-[72px] shrink-0 items-center justify-between px-6 lg:px-30">
-      <button
+      <Button
         v-if="state.currentStep > 1"
-        type="button"
-        class="bg-surface-l2 hover:bg-surface-l3 cursor-pointer rounded-md border-0 px-4 py-2"
+        variant="secondary"
         @click="goBack"
       >
-        <Text
-          as="span"
-          variant="subtitle2"
-          color="neutral"
-        >
-          {{ t('common.back') }}
-        </Text>
-      </button>
+        {{ t('common.back') }}
+      </Button>
       <span v-else />
 
-      <button
-        type="button"
-        class="bg-accent-emphasis-rest hover:bg-accent-emphasis-hover cursor-pointer rounded-[10px] border-0 px-5 py-2"
+      <Button
+        variant="primary"
         @click="isLastStep ? submit() : goNext()"
       >
-        <Text
-          as="span"
-          variant="subtitle2"
-          color="inverse"
-        >
-          {{ isLastStep ? t('nav.submit') : NEXT_LABEL[state.currentStep] }}
-        </Text>
-      </button>
+        {{ isLastStep ? t('nav.submit') : NEXT_LABEL[state.currentStep] }}
+      </Button>
     </div>
   </div>
 </template>

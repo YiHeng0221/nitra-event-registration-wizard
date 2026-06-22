@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import Icon from '@lib/nitra-ui/Icon/Icon.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -23,7 +24,7 @@ const appearance = computed(() => VARIANT[props.variant])
     :class="appearance.box"
     :role="appearance.role"
   >
-    <q-icon
+    <Icon
       v-if="icon"
       :name="icon"
       size="20px"

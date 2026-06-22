@@ -9,11 +9,12 @@ import { loadTicketTypes } from 'src/data/tickets'
 import { loadSessions } from 'src/data/sessions'
 import { loadAddons } from 'src/data/addons'
 import type { Session } from 'src/types/session'
-import Paper from 'src/components/Paper/Paper.vue'
+import Card from '@lib/nitra-ui/Card/Card.vue'
 import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
 import ErrorBanner from 'src/components/ErrorBanner/ErrorBanner.vue'
-import Text from 'src/components/Text/Text.vue'
-import VStack from 'src/components/Stack/VStack.vue'
+import Text from '@lib/nitra-ui/Text/Text.vue'
+import VStack from '@lib/nitra-ui/Stack/VStack.vue'
+import Button from '@lib/nitra-ui/Button/Button.vue'
 
 const { t } = useI18n()
 const { dateTime, sessionTitle, ticketName, addonName } = useLocale()
@@ -111,7 +112,7 @@ function sectionErrorClass(step: number): string {
       :items="errorList"
     />
 
-    <Paper
+    <Card
       :level="1"
       :class="sectionErrorClass(1)"
     >
@@ -123,13 +124,12 @@ function sectionErrorClass(step: number): string {
         >
           {{ t('step4.attendeeInfo') }}
         </Text>
-        <button
-          type="button"
-          class="text-brand cursor-pointer border-0 bg-transparent underline-offset-2 hover:underline"
+        <Button
+          variant="ghost"
           @click="editStep(1)"
         >
           {{ t('step4.editStep', { n: 1 }) }}
-        </button>
+        </Button>
       </div>
       <dl class="flex flex-col gap-2">
         <div
@@ -153,9 +153,9 @@ function sectionErrorClass(step: number): string {
           </Text>
         </div>
       </dl>
-    </Paper>
+    </Card>
 
-    <Paper
+    <Card
       :level="1"
       :class="sectionErrorClass(2)"
     >
@@ -167,13 +167,12 @@ function sectionErrorClass(step: number): string {
         >
           {{ t('step4.selectedSessions') }}
         </Text>
-        <button
-          type="button"
-          class="text-brand cursor-pointer border-0 bg-transparent underline-offset-2 hover:underline"
+        <Button
+          variant="ghost"
           @click="editStep(2)"
         >
           {{ t('step4.editStep', { n: 2 }) }}
-        </button>
+        </Button>
       </div>
       <VStack :gap="2">
         <Text
@@ -206,9 +205,9 @@ function sectionErrorClass(step: number): string {
           </Text>
         </div>
       </VStack>
-    </Paper>
+    </Card>
 
-    <Paper
+    <Card
       :level="1"
       :class="sectionErrorClass(3)"
     >
@@ -220,13 +219,12 @@ function sectionErrorClass(step: number): string {
         >
           {{ t('step4.addons') }}
         </Text>
-        <button
-          type="button"
-          class="text-brand cursor-pointer border-0 bg-transparent underline-offset-2 hover:underline"
+        <Button
+          variant="ghost"
           @click="editStep(3)"
         >
           {{ t('step4.editStep', { n: 3 }) }}
-        </button>
+        </Button>
       </div>
       <VStack :gap="2">
         <Text
@@ -258,7 +256,7 @@ function sectionErrorClass(step: number): string {
           </Text>
         </div>
       </VStack>
-    </Paper>
+    </Card>
 
     <OrderSummary
       :title="t('orderSummary.pricingTitle')"

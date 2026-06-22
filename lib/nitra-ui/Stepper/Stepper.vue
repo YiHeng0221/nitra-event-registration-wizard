@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import Text from 'src/components/Text/Text.vue'
+import Text from '@lib/nitra-ui/Text/Text.vue'
+import Icon from '@lib/nitra-ui/Icon/Icon.vue'
 
 export interface StepItem {
   n: number
@@ -13,11 +12,11 @@ const props = defineProps<{
   current: number
   /** Step numbers that currently carry validation errors. */
   errorSteps?: number[]
+  /** Mobile-only "Step N of M — Label" line (localized by the app; lib stays i18n-free). */
+  progressLabel?: string
 }>()
 
 const emit = defineEmits<{ navigate: [step: number] }>()
-
-const { t } = useI18n()
 
 type Status = 'done' | 'current' | 'error' | 'future'
 
@@ -27,9 +26,6 @@ function statusOf(step: number): Status {
   if (step === props.current) return 'current'
   return 'future'
 }
-
-/** Label of the active step — shown on its own line on mobile (labels hide there). */
-const currentLabel = computed(() => props.steps.find((step) => step.n === props.current)?.label ?? '')
 
 const CIRCLE_CLASS: Record<Status, string> = {
   done: 'bg-brand-emphasis-rest text-inverse',
@@ -61,12 +57,12 @@ const LABEL_CLASS: Record<Status, string> = {
             class="flex h-8 w-8 items-center justify-center rounded-full"
             :class="CIRCLE_CLASS[statusOf(step.n)]"
           >
-            <q-icon
+            <Icon
               v-if="statusOf(step.n) === 'done'"
               name="check"
               size="18px"
             />
-            <q-icon
+            <Icon
               v-else-if="statusOf(step.n) === 'error'"
               name="priority_high"
               size="16px"
@@ -100,13 +96,14 @@ const LABEL_CLASS: Record<Status, string> = {
 
     <!-- Mobile-only active step label (per-step labels are hidden above). -->
     <Text
+      v-if="progressLabel"
       as="p"
       variant="subtitle2"
       color="neutral"
       align="center"
       class="mt-2 md:hidden"
     >
-      {{ t('stepper.progress', { current, total: steps.length, label: currentLabel }) }}
+      {{ progressLabel }}
     </Text>
   </div>
 </template>
