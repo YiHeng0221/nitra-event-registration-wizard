@@ -32,42 +32,38 @@ export function useConflicts(): UseConflicts {
 
   const sessionConflicts = computed<Array<[string, string]>>(() => {
     const picked = selectedSessions.value
-    const pairs: Array<[string, string]> = []
-    for (let i = 0; i < picked.length; i += 1) {
-      const a = picked[i]
-      if (!a) continue
-      for (let j = i + 1; j < picked.length; j += 1) {
-        const b = picked[j]
-        if (!b) continue
-        if (isOverlapping(new Date(a.date), new Date(a.endDate), new Date(b.date), new Date(b.endDate))) {
-          pairs.push([a.id, b.id])
-        }
-      }
-    }
-    return pairs
+    // Each session pairs only with the ones after it — slice(i + 1) avoids
+    // duplicate/self pairs, preserving the original (i, j>i) iteration order.
+    return picked.flatMap((a, i) =>
+      picked
+        .slice(i + 1)
+        .filter((b) =>
+          isOverlapping(new Date(a.date), new Date(a.endDate), new Date(b.date), new Date(b.endDate)),
+        )
+        .map((b): [string, string] => [a.id, b.id]),
+    )
   })
 
   const unavailableWorkshopIds = computed<Set<string>>(() => {
     const picked = selectedSessions.value
-    const ids = new Set<string>()
-    for (const workshop of workshops) {
+    const overlapping = workshops.filter((workshop) => {
       const workshopStart = new Date(workshop.date)
       const workshopEnd = new Date(workshop.endDate)
-      const overlapsSelected = picked.some((session) =>
+      return picked.some((session) =>
         isOverlapping(workshopStart, workshopEnd, new Date(session.date), new Date(session.endDate)),
       )
-      if (overlapsSelected) ids.add(workshop.id)
-    }
-    return ids
+    })
+    return new Set(overlapping.map((workshop) => workshop.id))
   })
 
-  const fullSessionIds = computed<Set<string>>(() => {
-    const ids = new Set<string>()
-    for (const session of sessions) {
-      if (session.registered >= session.capacity) ids.add(session.id)
-    }
-    return ids
-  })
+  const fullSessionIds = computed<Set<string>>(
+    () =>
+      new Set(
+        sessions
+          .filter((session) => session.registered >= session.capacity)
+          .map((session) => session.id),
+      ),
+  )
 
   return { sessionConflicts, unavailableWorkshopIds, fullSessionIds }
 }

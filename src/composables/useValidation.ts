@@ -69,11 +69,11 @@ export function useValidation(): UseValidation {
 
     const result = registrationSchema.safeParse(state)
     if (!result.success) {
-      for (const issue of result.error.issues) {
+      result.error.issues.forEach((issue) => {
         // Use the leaf path segment as the field key (e.g. attendee.fullName -> fullName).
         const field = issue.path[issue.path.length - 1]
         addError(String(field ?? 'form'), issue.message)
-      }
+      })
     }
 
     // Session↔session conflicts are deferred to submit (not a live block).
@@ -83,9 +83,9 @@ export function useValidation(): UseValidation {
     }
 
     const stepHasError: Record<number, boolean> = {}
-    for (const field of Object.keys(errors)) {
+    Object.keys(errors).forEach((field) => {
       stepHasError[FIELD_STEP[field] ?? 4] = true
-    }
+    })
 
     const erroredSteps = Object.keys(stepHasError).map(Number)
     return {
@@ -122,24 +122,20 @@ export function useValidation(): UseValidation {
     return key === undefined ? undefined : t(key)
   }
 
-  const errorList = computed<ErrorListItem[]>(() => {
-    const items: ErrorListItem[] = []
-    for (const [field, messages] of Object.entries(fieldErrors.value)) {
-      for (const message of messages) items.push({ step: FIELD_STEP[field] ?? 4, message: t(message) })
-    }
-    return items.sort((a, b) => a.step - b.step)
-  })
+  const errorList = computed<ErrorListItem[]>(() =>
+    Object.entries(fieldErrors.value)
+      .flatMap(([field, messages]) =>
+        messages.map((message) => ({ step: FIELD_STEP[field] ?? 4, message: t(message) })),
+      )
+      .sort((a, b) => a.step - b.step),
+  )
 
   const stepHasError = computed(() => liveResult.value?.stepHasError ?? {})
 
   const sessionConflictIds = computed<Set<string>>(() => {
-    const ids = new Set<string>()
-    if (!hasAttemptedSubmit.value) return ids
-    for (const [a, b] of sessionConflicts.value) {
-      ids.add(a)
-      ids.add(b)
-    }
-    return ids
+    if (!hasAttemptedSubmit.value) return new Set<string>()
+    // Flatten the conflict pairs into a deduped id set.
+    return new Set(sessionConflicts.value.flat())
   })
 
   return {
