@@ -10,7 +10,7 @@ withDefaults(
   { variant: 'primary', type: 'button' },
 )
 
-const emit = defineEmits<{ click: [MouseEvent] }>()
+// No explicit click emit — a parent's @click falls through to the root <button>.
 
 interface VariantSpec {
   btn: string
@@ -38,7 +38,6 @@ const VARIANT: Record<'primary' | 'secondary' | 'ghost', VariantSpec> = {
     :disabled="disabled"
     class="cursor-pointer border-0 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
     :class="VARIANT[variant].btn"
-    @click="emit('click', $event)"
   >
     <Text
       as="span"

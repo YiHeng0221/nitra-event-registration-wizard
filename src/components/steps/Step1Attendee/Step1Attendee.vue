@@ -8,6 +8,7 @@ import { loadTicketTypes } from 'src/data/tickets'
 import SelectableCard from '@lib/nitra-ui/SelectableCard/SelectableCard.vue'
 import Input from '@lib/nitra-ui/Input/Input.vue'
 import Chip from '@lib/nitra-ui/Chip/Chip.vue'
+import Icon from '@lib/nitra-ui/Icon/Icon.vue'
 import Text from '@lib/nitra-ui/Text/Text.vue'
 
 const { t } = useI18n()
@@ -91,14 +92,12 @@ const merchSelected = computed(() => Object.keys(state.merchandise).length > 0)
             tone="success"
             class="self-start"
           >
-            <q-icon
+            <Icon
               name="check"
               size="14px"
-              class="text-inverse"
             />
             <Text
               variant="body-xs-medium"
-              color="inverse"
               as="span"
             >
               {{ t('step1.selected') }}

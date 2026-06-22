@@ -43,6 +43,7 @@ const messages: typeof en = {
   },
   step2: {
     title: '選擇場次',
+    selectDay: '選擇會議日期',
     selectedCount: '已選擇 {count} 個場次',
     soldOut: '已額滿',
     spotsLeft: '剩餘 {count} 個名額',
@@ -50,6 +51,7 @@ const messages: typeof en = {
   },
   step3: {
     title: '選擇加購項目',
+    selectCategory: '選擇加購類別',
     catWorkshops: '工作坊',
     catMeals: '餐點方案',
     catMerch: '周邊商品',

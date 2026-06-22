@@ -35,6 +35,15 @@ const errorSteps = computed(() =>
     .map(([step]) => Number(step)),
 )
 
+// Localized mobile "Step N of M — Label" line — built here so Stepper stays i18n-free.
+const progressLabel = computed(() =>
+  t('stepper.progress', {
+    current: state.currentStep,
+    total: STEPS.value.length,
+    label: STEPS.value.find((step) => step.n === state.currentStep)?.label ?? '',
+  }),
+)
+
 const isLastStep = computed(() => state.currentStep >= STEPS.value.length)
 
 function goTo(step: number): void {
@@ -68,6 +77,7 @@ function submit(): void {
         :steps="STEPS"
         :current="state.currentStep"
         :error-steps="errorSteps"
+        :progress-label="progressLabel"
         @navigate="goTo"
       />
     </div>

@@ -10,6 +10,7 @@ import type { Session, SessionTrack } from 'src/types/session'
 import SelectableCard from '@lib/nitra-ui/SelectableCard/SelectableCard.vue'
 import OptionGroup from '@lib/nitra-ui/OptionGroup/OptionGroup.vue'
 import Chip from '@lib/nitra-ui/Chip/Chip.vue'
+import Checkbox from '@lib/nitra-ui/Checkbox/Checkbox.vue'
 import Text from '@lib/nitra-ui/Text/Text.vue'
 
 const { t } = useI18n()
@@ -88,7 +89,7 @@ function spotsClass(session: Session): string {
       block
       :options="dayOptions"
       :model-value="activeDay"
-      :label="t('step2.title')"
+      :label="t('step2.selectDay')"
       @update:model-value="(v) => (activeDay = String(v))"
     />
 
@@ -122,9 +123,8 @@ function spotsClass(session: Session): string {
               {{ trackLabel(session.track) }}
             </Text>
           </Chip>
-          <q-icon
-            :name="isSelected(session.id) ? 'check_box' : 'check_box_outline_blank'"
-            size="18px"
+          <Checkbox
+            :checked="isSelected(session.id)"
             :class="isSelected(session.id) ? 'text-[var(--bg-brand-emphasis-rest)]' : 'text-gray-700'"
           />
         </div>

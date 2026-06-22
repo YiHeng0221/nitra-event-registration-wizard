@@ -42,6 +42,7 @@ export default {
   },
   step2: {
     title: 'Select Sessions',
+    selectDay: 'Select conference day',
     selectedCount: '{count} session(s) selected',
     soldOut: 'Sold Out',
     spotsLeft: '{count} spots left',
@@ -49,6 +50,7 @@ export default {
   },
   step3: {
     title: 'Select Add-ons',
+    selectCategory: 'Select add-on category',
     catWorkshops: 'Workshops',
     catMeals: 'Meal Packages',
     catMerch: 'Merchandise',

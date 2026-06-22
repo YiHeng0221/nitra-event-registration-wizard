@@ -13,6 +13,7 @@ const localeOptions = computed(() =>
 
 /** Switch locale and remember the choice for next visit. */
 function setLocale(value: string | number | null): void {
+  if (typeof value !== 'string' || !SUPPORTED_LOCALES.includes(value as AppLocale)) return
   const next = value as AppLocale
   locale.value = next
   try {

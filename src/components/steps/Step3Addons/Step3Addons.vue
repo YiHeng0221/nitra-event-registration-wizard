@@ -96,7 +96,7 @@ function setSize(id: string, size: string | number | null): void {
         class="mb-4"
         :options="categoryOptions"
         :model-value="category"
-        :label="t('step3.title')"
+        :label="t('step3.selectCategory')"
         @update:model-value="(v) => (category = v as CategoryKey)"
       />
 

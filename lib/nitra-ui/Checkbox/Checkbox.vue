@@ -1,19 +1,21 @@
 <script setup lang="ts">
-defineProps<{
-  label?: string
-  disabled?: boolean
-}>()
+import Icon from '@lib/nitra-ui/Icon/Icon.vue'
 
-const model = defineModel<boolean>({ default: false })
+// Presentational checkbox indicator (the parent owns the toggle — e.g. a
+// SelectableCard). Colour it with a fallthrough text-* class.
+withDefaults(
+  defineProps<{
+    checked?: boolean
+    size?: string
+  }>(),
+  { checked: false, size: '18px' },
+)
 </script>
 
 <template>
-  <q-checkbox
-    v-model="model"
-    :label="$slots.default ? undefined : label"
-    :disable="disabled"
-    color="primary"
-  >
-    <slot />
-  </q-checkbox>
+  <Icon
+    :name="checked ? 'check_box' : 'check_box_outline_blank'"
+    :size="size"
+    aria-hidden="true"
+  />
 </template>
