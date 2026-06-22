@@ -5,7 +5,11 @@ import { formatDateTime, formatTimeRange, formatDayLabel } from 'src/utils/datet
 /** App locale → Intl/BCP-47 locale for date formatting. */
 const INTL_LOCALE: Record<string, string> = { en: 'en-US', 'zh-TW': 'zh-TW' }
 
-/** Mock perk strings → i18n keys (perks are shared English strings in the mock). */
+/**
+ * Mock perk strings → i18n keys (perks are shared English strings in the mock).
+ * These keys must match the perk text in `src/mocks/event.js` verbatim; if the
+ * mock copy changes, update this map or the perk falls back to the raw string.
+ */
 const PERK_KEY: Record<string, string> = {
   'All sessions': 'allSessions',
   'Keynote access': 'keynoteAccess',
