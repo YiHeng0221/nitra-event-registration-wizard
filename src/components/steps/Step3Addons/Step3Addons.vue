@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRegistration } from 'src/composables/useRegistration'
 import { useConflicts } from 'src/composables/useConflicts'
+import { useLocale } from 'src/composables/useLocale'
 import { loadAddons } from 'src/data/addons'
-import { formatTimeRange } from 'src/utils/datetime'
 import type { WorkshopAddon, MealAddon, MerchandiseAddon } from 'src/types/addon'
 import SelectableCard from 'src/components/SelectableCard/SelectableCard.vue'
 import NumberStepper from 'src/components/NumberStepper/NumberStepper.vue'
@@ -11,6 +12,8 @@ import Banner from 'src/components/Banner/Banner.vue'
 import OrderSummary from 'src/components/OrderSummary/OrderSummary.vue'
 import Text from 'src/components/Text/Text.vue'
 
+const { t } = useI18n()
+const { timeRange, addonName, addonDesc } = useLocale()
 const { state } = useRegistration()
 const { unavailableWorkshopIds } = useConflicts()
 
@@ -19,12 +22,12 @@ const workshops = addons.filter((a): a is WorkshopAddon => a.category === 'works
 const meals = addons.filter((a): a is MealAddon => a.category === 'meal')
 const merchandise = addons.filter((a): a is MerchandiseAddon => a.category === 'merchandise')
 
-const CATEGORIES = [
-  { key: 'workshop', label: 'Workshops' },
-  { key: 'meal', label: 'Meal Packages' },
-  { key: 'merchandise', label: 'Merchandise' },
-] as const
-type CategoryKey = (typeof CATEGORIES)[number]['key']
+type CategoryKey = 'workshop' | 'meal' | 'merchandise'
+const CATEGORIES = computed<Array<{ key: CategoryKey; label: string }>>(() => [
+  { key: 'workshop', label: t('step3.catWorkshops') },
+  { key: 'meal', label: t('step3.catMeals') },
+  { key: 'merchandise', label: t('step3.catMerch') },
+])
 const category = ref<CategoryKey>('workshop')
 
 // --- Workshops ---
@@ -83,7 +86,7 @@ function setSize(id: string, size: string | number | null): void {
         color="neutral"
         class="mb-4"
       >
-        Select Add-ons
+        {{ t('step3.title') }}
       </Text>
 
       <div
@@ -128,7 +131,7 @@ function setSize(id: string, size: string | number | null): void {
               variant="subtitle1"
               color="neutral"
             >
-              {{ workshop.name }}
+              {{ addonName(workshop.id) }}
             </Text>
             <Text
               as="span"
@@ -142,26 +145,26 @@ function setSize(id: string, size: string | number | null): void {
             variant="body"
             color="muted"
           >
-            {{ workshop.description }}
+            {{ addonDesc(workshop.id) }}
           </Text>
           <Text
             variant="body"
             color="muted"
           >
-            {{ formatTimeRange(workshop.date, workshop.endDate) }}
+            {{ timeRange(workshop.date, workshop.endDate) }}
           </Text>
           <Text
             variant="body-xs-medium"
             :class="workshopFull(workshop) || unavailableWorkshopIds.has(workshop.id) ? 'text-danger' : 'text-neutral-quiet'"
           >
             <template v-if="workshopFull(workshop)">
-              Sold Out
+              {{ t('step3.soldOut') }}
             </template>
             <template v-else-if="unavailableWorkshopIds.has(workshop.id)">
-              Unavailable — overlaps a selected session
+              {{ t('step3.unavailable') }}
             </template>
             <template v-else>
-              {{ Math.max(workshop.capacity - workshop.registered, 0) }} spots remaining
+              {{ t('step3.spotsRemaining', { count: Math.max(workshop.capacity - workshop.registered, 0) }) }}
             </template>
           </Text>
         </SelectableCard>
@@ -185,7 +188,7 @@ function setSize(id: string, size: string | number | null): void {
               variant="subtitle1"
               color="neutral"
             >
-              {{ meal.name }}
+              {{ addonName(meal.id) }}
             </Text>
             <Text
               as="span"
@@ -199,7 +202,7 @@ function setSize(id: string, size: string | number | null): void {
             variant="body"
             color="muted"
           >
-            {{ meal.description }}
+            {{ addonDesc(meal.id) }}
           </Text>
         </SelectableCard>
       </div>
@@ -218,14 +221,13 @@ function setSize(id: string, size: string | number | null): void {
             variant="body-md-semibold"
             color="neutral"
           >
-            Shipping Information
+            {{ t('step3.shippingTitle') }}
           </Text>
           <Text
             variant="body-md"
             color="neutral"
           >
-            Merchandise items will be shipped to your address one week before the conference. Please
-            ensure your shipping address in Step 1 is correct.
+            {{ t('step3.shippingBody') }}
           </Text>
         </Banner>
 
@@ -241,7 +243,7 @@ function setSize(id: string, size: string | number | null): void {
               variant="subtitle1"
               color="neutral"
             >
-              {{ item.name }}
+              {{ addonName(item.id) }}
             </Text>
             <Text
               as="span"
@@ -255,7 +257,7 @@ function setSize(id: string, size: string | number | null): void {
             variant="body"
             color="muted"
           >
-            {{ item.description }}
+            {{ addonDesc(item.id) }}
           </Text>
 
           <div class="flex flex-wrap items-center gap-4">
@@ -268,7 +270,7 @@ function setSize(id: string, size: string | number | null): void {
                 variant="body-medium"
                 color="muted"
               >
-                Size:
+                {{ t('step3.size') }}
               </Text>
               <select
                 class="bg-surface-l0 border-neutral-muted text-neutral rounded-md border px-3 py-1.5 outline-none"
@@ -279,7 +281,7 @@ function setSize(id: string, size: string | number | null): void {
                   value=""
                   disabled
                 >
-                  Select
+                  {{ t('common.select') }}
                 </option>
                 <option
                   v-for="size in item.sizes"
@@ -296,7 +298,7 @@ function setSize(id: string, size: string | number | null): void {
                 variant="body-medium"
                 color="muted"
               >
-                Qty:
+                {{ t('step3.qty') }}
               </Text>
               <NumberStepper
                 :model-value="quantityOf(item.id)"
@@ -309,7 +311,7 @@ function setSize(id: string, size: string | number | null): void {
                 variant="body-xs"
                 color="quiet"
               >
-                max {{ item.maxQuantity }}
+                {{ t('step3.max', { count: item.maxQuantity }) }}
               </Text>
             </div>
           </div>
@@ -324,7 +326,7 @@ function setSize(id: string, size: string | number | null): void {
               name="check"
               size="14px"
             />
-            Added to order
+            {{ t('step3.added') }}
           </Text>
         </SelectableCard>
       </div>

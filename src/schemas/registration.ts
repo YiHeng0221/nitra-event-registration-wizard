@@ -25,7 +25,7 @@ export const registrationSchema = z
       ctx.addIssue({
         code: 'custom',
         path: ['attendee', 'shippingAddress'],
-        message: 'Shipping address is required when merchandise is selected',
+        message: 'validation.shippingMerch',
       })
     }
   })
