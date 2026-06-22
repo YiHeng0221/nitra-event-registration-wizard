@@ -13,11 +13,15 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
 })
 
 export interface UsePricing {
+  /** Selected ticket tier's price, or 0 when none is chosen. */
   ticketPrice: ComputedRef<number>
+  /** Sum of the selected workshops' prices (the VIP discount base). */
   workshopSubtotal: ComputedRef<number>
+  /** Workshops + meals + merchandise (quantity-weighted); excludes the ticket. */
   addonsSubtotal: ComputedRef<number>
   /** VIP: workshop subtotal × 10%; otherwise 0. */
   discount: ComputedRef<number>
+  /** Final payable: ticket + add-ons − discount. */
   total: ComputedRef<number>
   /** Format a number as `$X,XXX.XX`. */
   formatCurrency: (amount: number) => string
