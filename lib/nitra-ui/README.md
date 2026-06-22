@@ -23,7 +23,7 @@ import Button from '@lib/nitra-ui/Button/Button.vue'
 | `Input` | Text field (in a `FieldShell`) |
 | `Select` | Native `<select>` field (in a `FieldShell`) — available, see ADR-0007 |
 | `NumericInput` | Quantity stepper with min/max |
-| `Checkbox` | Checkbox (wraps `q-checkbox`) — available, see ADR-0007 |
+| `Checkbox` | Presentational `check_box` indicator (parent owns the toggle) — used by Step 2 cards |
 | `Chip` | Pill/badge — `neutral` / `success` / `danger` / `custom` |
 | `OptionGroup` | Segmented control — `tab` / `pill`, `block` for full-width mobile |
 | `FieldShell` | Label / required / help / error wrapper for form controls |
