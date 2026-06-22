@@ -25,23 +25,44 @@ function toRange(item: { id: string; date: string; endDate: string }): TimeRange
   return { id: item.id, start: new Date(item.date), end: new Date(item.endDate) }
 }
 
-/** Reactive time-conflict and availability derivations. */
+/**
+ * Time-conflict and availability derivations, grouped by lifecycle: a static
+ * capacity set, a shared reactive base, then the live (Step 3) and submit-only
+ * (Step 4) derivations built on it.
+ */
 export function useConflicts(): UseConflicts {
   const { state } = useRegistration()
   const { sessions, sessionById, workshops } = useCatalog()
 
+  // --- Static (capacity never changes) -------------------------------------
+  // Sessions at capacity, computed once as a plain Set.
+  const fullSessionIds = new Set(
+    sessions
+      .filter((session) => session.registered >= session.capacity)
+      .map((session) => session.id),
+  )
   // Workshops are static — parse their ranges once, not per comparison.
   const workshopRanges = workshops.map(toRange)
 
+  // --- Reactive base (recomputes with the selection) -----------------------
   const selectedSessions = computed<Session[]>(() =>
     state.selectedSessionIds
       .map((id) => sessionById.get(id))
       .filter((session): session is Session => session !== undefined),
   )
-
-  // Parse the selected sessions' ranges once per change, reused by both derivations below.
+  // Parsed once per change, reused by both derivations below.
   const selectedRanges = computed<TimeRange[]>(() => selectedSessions.value.map(toRange))
 
+  // --- Live availability (Step 3) ------------------------------------------
+  const unavailableWorkshopIds = computed<Set<string>>(() => {
+    const ranges = selectedRanges.value
+    const overlapping = workshopRanges.filter((workshop) =>
+      ranges.some((session) => isOverlapping(workshop.start, workshop.end, session.start, session.end)),
+    )
+    return new Set(overlapping.map((workshop) => workshop.id))
+  })
+
+  // --- Submit-only (surfaced at Step 4) ------------------------------------
   const sessionConflicts = computed<Array<[string, string]>>(() => {
     const ranges = selectedRanges.value
     // Each session pairs only with the ones after it — slice(i + 1) avoids
@@ -53,22 +74,6 @@ export function useConflicts(): UseConflicts {
         .map((b): [string, string] => [a.id, b.id]),
     )
   })
-
-  const unavailableWorkshopIds = computed<Set<string>>(() => {
-    const ranges = selectedRanges.value
-    const overlapping = workshopRanges.filter((workshop) =>
-      ranges.some((session) => isOverlapping(workshop.start, workshop.end, session.start, session.end)),
-    )
-    return new Set(overlapping.map((workshop) => workshop.id))
-  })
-
-  // Capacity is static mock data, so this never changes — compute it once as a
-  // plain Set rather than a (never-recomputing) computed.
-  const fullSessionIds = new Set(
-    sessions
-      .filter((session) => session.registered >= session.capacity)
-      .map((session) => session.id),
-  )
 
   return { sessionConflicts, unavailableWorkshopIds, fullSessionIds }
 }
